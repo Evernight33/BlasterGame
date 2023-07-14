@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "BlasterCharacter.generated.h"
 
+class UWidgetComponent;
+
 UCLASS()
 class BLASTER_API ABlasterCharacter : public ACharacter
 {
@@ -30,4 +32,7 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	class UCameraComponent* FollowCamera;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UWidgetComponent* OverheadWidget;
 };
