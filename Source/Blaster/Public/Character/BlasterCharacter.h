@@ -7,6 +7,7 @@
 #include "BlasterCharacter.generated.h"
 
 class UWidgetComponent;
+class ABaseWeapon;
 
 UCLASS()
 class BLASTER_API ABlasterCharacter : public ACharacter
@@ -17,6 +18,9 @@ public:
 	ABlasterCharacter();
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	void SetOverlappingWeapon(ABaseWeapon* Weapon);
 
 protected:
 	virtual void BeginPlay() override;
@@ -35,4 +39,10 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UWidgetComponent* OverheadWidget;
+
+	UPROPERTY(ReplicatedUsing = OnRep_OverlappingWeapon)
+	ABaseWeapon* OverlappingWeapon;
+
+	UFUNCTION()
+	void OnRep_OverlappingWeapon(ABaseWeapon* LastWeapon);
 };

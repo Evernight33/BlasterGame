@@ -6,7 +6,6 @@
 #include "GameFramework/Actor.h"
 #include "BaseWeapon.generated.h"
 
-
 class UWidgetComponent;
 
 UENUM(BlueprintType)
@@ -26,6 +25,7 @@ class BLASTER_API ABaseWeapon : public AActor
 public:	
 	ABaseWeapon();
 	virtual void Tick(float DeltaTime) override;
+	void ShowPickupWidget(bool bShowWidget);
 
 protected:
 	virtual void BeginPlay() override;
@@ -40,6 +40,13 @@ protected:
 		const FHitResult& SweepResult
 	);
 
+	UFUNCTION()
+		void OnSphereEndOverlap(
+			UPrimitiveComponent* OverlappedComponent,
+			AActor* OtherActor,
+			UPrimitiveComponent* OtherComp,
+			int32 OtherBodyIndex
+		);
 private:
 	UPROPERTY(VisibleAnywhere, Category = "Weapon Propetries")
 	USkeletalMeshComponent* WeaponMesh;
