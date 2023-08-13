@@ -8,6 +8,7 @@
 #include "Components/WidgetComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "Blaster/Public/Weapon/BaseWeapon.h"
+#include "Blaster/Public/BlasterComponents/CombatComponent.h"
 
 ABlasterCharacter::ABlasterCharacter()
 {
@@ -32,6 +33,10 @@ ABlasterCharacter::ABlasterCharacter()
 
 	OverheadWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("OverheadWidget"));
 	OverheadWidget->SetupAttachment(RootComponent);
+
+	Combat = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
+	Combat->SetIsReplicated(true);
+
 }
 
 void ABlasterCharacter::Tick(float DeltaTime)
@@ -76,6 +81,18 @@ void ABlasterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	PlayerInputComponent->BindAxis(TEXT("Turn"), this, &ABlasterCharacter::Turn);
 	PlayerInputComponent->BindAxis(TEXT("LookUp"), this, &ABlasterCharacter::LookUp);
 
+	PlayerInputComponent->BindAction("Equip", IE_Pressed, this, &ABlasterCharacter::EquipButtonPressed);
+
+}
+
+void ABlasterCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	if (Combat)
+	{
+		Combat->Character = this;
+	}
 }
 
 void ABlasterCharacter::BeginPlay()
@@ -118,6 +135,14 @@ void ABlasterCharacter::LookUp(float Value)
 	{
 		AddControllerPitchInput(Value);
 	}	
+}
+
+void ABlasterCharacter::EquipButtonPressed()
+{
+	if (Combat && HasAuthority())
+	{
+		Combat->EquipWeapon(OverlappingWeapon);
+	}
 }
 
 void  ABlasterCharacter::OnRep_OverlappingWeapon(ABaseWeapon* LastWeapon)

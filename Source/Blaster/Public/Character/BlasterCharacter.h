@@ -8,6 +8,7 @@
 
 class UWidgetComponent;
 class ABaseWeapon;
+class UCombatComponent;
 
 UCLASS()
 class BLASTER_API ABlasterCharacter : public ACharacter
@@ -19,7 +20,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
+	virtual void PostInitializeComponents() override;
 	void SetOverlappingWeapon(ABaseWeapon* Weapon);
 
 protected:
@@ -29,6 +30,7 @@ protected:
 	void MoveRight(float Value);
 	void Turn(float Value);
 	void LookUp(float Value);
+	void EquipButtonPressed();
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = Camera)
@@ -45,4 +47,9 @@ private:
 
 	UFUNCTION()
 	void OnRep_OverlappingWeapon(ABaseWeapon* LastWeapon);
+
+	UPROPERTY(VisibleAnywhere)
+	UCombatComponent* Combat;
+
+
 };
