@@ -45,11 +45,12 @@ private:
 	UPROPERTY(ReplicatedUsing = OnRep_OverlappingWeapon)
 	ABaseWeapon* OverlappingWeapon;
 
-	UFUNCTION()
-	void OnRep_OverlappingWeapon(ABaseWeapon* LastWeapon);
-
 	UPROPERTY(VisibleAnywhere)
 	UCombatComponent* Combat;
 
+	UFUNCTION()
+	void OnRep_OverlappingWeapon(ABaseWeapon* LastWeapon);
 
+	UFUNCTION(Server, Reliable)
+	void ServerEquipButtonPressed();
 };
