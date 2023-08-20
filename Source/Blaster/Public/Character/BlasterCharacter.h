@@ -17,11 +17,14 @@ class BLASTER_API ABlasterCharacter : public ACharacter
 
 public:
 	ABlasterCharacter();
+
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void PostInitializeComponents() override;
+
 	void SetOverlappingWeapon(ABaseWeapon* Weapon);
+	bool IsWeaponEquipped();
 
 protected:
 	virtual void BeginPlay() override;
