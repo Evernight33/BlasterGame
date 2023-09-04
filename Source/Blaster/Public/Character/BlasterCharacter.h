@@ -25,6 +25,7 @@ public:
 
 	void SetOverlappingWeapon(ABaseWeapon* Weapon);
 	bool IsWeaponEquipped();
+	bool IsAiming();
 
 protected:
 	virtual void BeginPlay() override;
@@ -35,6 +36,8 @@ protected:
 	void LookUp(float Value);
 	void EquipButtonPressed();
 	void CrouchButtonPressed();
+	void AimButtonPressed();
+	void AimButtonRealeased();
 private:
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	class USpringArmComponent* CameraBoom;

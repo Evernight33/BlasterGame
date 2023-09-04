@@ -13,7 +13,6 @@ UCombatComponent::UCombatComponent()
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
-
 void UCombatComponent::BeginPlay()
 {
 	Super::BeginPlay();
@@ -29,11 +28,12 @@ void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(UCombatComponent, EquippedWeapon);
+	DOREPLIFETIME(UCombatComponent, bAiming);
 }
 
 void UCombatComponent::EquipWeapon(ABaseWeapon* WeaponToEquip)
 {
-	if (Character || WeaponToEquip)
+	if (Character && WeaponToEquip)
 	{
 		EquippedWeapon = WeaponToEquip;
 		EquippedWeapon->SetWeaponState(EWeaponState::EWS_Equipped);
@@ -47,4 +47,15 @@ void UCombatComponent::EquipWeapon(ABaseWeapon* WeaponToEquip)
 
 		EquippedWeapon->SetOwner(Character);
 	}
+}
+
+void UCombatComponent::SetAiming(bool bIsAiming)
+{
+	bAiming = bIsAiming;
+	ServerSetAiming(bIsAiming);
+}
+
+void UCombatComponent::ServerSetAiming_Implementation(bool bIsAiming)
+{
+	bAiming = bIsAiming;
 }

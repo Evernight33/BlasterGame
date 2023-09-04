@@ -70,13 +70,17 @@ void ABlasterCharacter::SetOverlappingWeapon(ABaseWeapon* Weapon)
 		{
 			OverlappingWeapon->ShowPickupWidget(true);
 		}
-		
 	}
 }
 
 bool ABlasterCharacter::IsWeaponEquipped()
 {
 	return (Combat && Combat->EquippedWeapon);
+}
+
+bool ABlasterCharacter::IsAiming()
+{
+	return (Combat && Combat->bAiming);
 }
 
 void ABlasterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -92,6 +96,9 @@ void ABlasterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 	PlayerInputComponent->BindAction("Equip", IE_Pressed, this, &ABlasterCharacter::EquipButtonPressed);
 	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &ABlasterCharacter::CrouchButtonPressed);
+
+	PlayerInputComponent->BindAction("Aim", IE_Pressed, this, &ABlasterCharacter::AimButtonPressed);
+	PlayerInputComponent->BindAction("Aim", IE_Released, this, &ABlasterCharacter::AimButtonRealeased);
 }
 
 void ABlasterCharacter::PostInitializeComponents()
@@ -170,6 +177,22 @@ void ABlasterCharacter::CrouchButtonPressed()
 	else
 	{
 		Crouch();
+	}
+}
+
+void ABlasterCharacter::AimButtonPressed()
+{
+	if (Combat)
+	{
+		Combat->SetAiming(true);
+	}
+}
+
+void ABlasterCharacter::AimButtonRealeased()
+{
+	if (Combat)
+	{
+		Combat->SetAiming(false);
 	}
 }
 
