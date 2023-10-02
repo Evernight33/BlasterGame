@@ -9,6 +9,7 @@
 #include "Net/UnrealNetwork.h"
 #include "Blaster/Public/Weapon/BaseWeapon.h"
 #include "Blaster/Public/BlasterComponents/CombatComponent.h"
+#include "Components/CapsuleComponent.h"
 
 ABlasterCharacter::ABlasterCharacter()
 {
@@ -40,6 +41,11 @@ ABlasterCharacter::ABlasterCharacter()
 	if (GetCharacterMovement())
 	{
 		GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
+	}
+
+	if (GetCapsuleComponent())
+	{
+		GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 	}
 }
 
