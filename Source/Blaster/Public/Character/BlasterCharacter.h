@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Blaster/Public/BlasterTypes/TurningInPlace.h"
+#include "Blaster/Public/BlasterTypes/TurningInPlace.h"
 #include "BlasterCharacter.generated.h"
 
 class UWidgetComponent;
@@ -29,6 +31,7 @@ public:
 
 	FORCEINLINE float GetAO_Yaw() const { return AO_Yaw; }
 	FORCEINLINE float GetAO_Pitch() const { return AO_Pitch; }
+	FORCEINLINE ETurningInPlace GetTurningInPlace() const { return TurningInPlace; };
 
 	ABaseWeapon* GetEquippedWeapon();
 
@@ -70,4 +73,6 @@ private:
 	float AO_Yaw;
 	float AO_Pitch;
 	FRotator StartingAimRotation;
+
+	ETurningInPlace TurningInPlace;
 };
