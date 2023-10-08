@@ -17,6 +17,9 @@ class BLASTER_API ABlasterCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
+private:
+	void TurnInPlace(float DeltaTime);
+
 public:
 	ABlasterCharacter();
 
