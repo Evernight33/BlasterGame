@@ -56,7 +56,7 @@ private:
 	FTransform LeftHandTransform;
 
 	UPROPERTY(BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
-	ETurningInPlace TurningInPlace;
+	ETurningInPlace TurningInPlace = ETurningInPlace::ETIP_NotTurning;
 
 	FRotator CharacterRotationLastFrame;
 	FRotator CharacterRotation;
