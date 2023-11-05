@@ -57,6 +57,7 @@ void UCombatComponent::EquipWeapon(ABaseWeapon* WeaponToEquip)
 		EquippedWeapon->SetOwner(Character);
 		Character->GetCharacterMovement()->bOrientRotationToMovement = false;
 		Character->bUseControllerRotationYaw = true;
+
 	}
 }
 

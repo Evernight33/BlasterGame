@@ -87,6 +87,8 @@ void ABlasterCharacter::SetOverlappingWeapon(ABaseWeapon* Weapon)
 
 void ABlasterCharacter::TurnInPlace(float DeltaTime)
 {
+	UE_LOG(LogTemp, Display, TEXT("AO_Yaw: %f"), AO_Yaw);
+
 	if (AO_Yaw > 90.0f)
 	{
 		TurningInPlace = ETurningInPlace::ETIP_Right;
@@ -241,7 +243,7 @@ void ABlasterCharacter::AimButtonRealeased()
 		Combat->SetAiming(false);
 	}
 }
-
+PRAGMA_DISABLE_OPTIMIZATION
 void ABlasterCharacter::AimOffset(float DeltaTime)
 {
 	if (Combat && Combat->EquippedWeapon)
@@ -290,7 +292,7 @@ void ABlasterCharacter::AimOffset(float DeltaTime)
 		}
 	}
 }
-
+PRAGMA_ENABLE_OPTIMIZATION
 void  ABlasterCharacter::OnRep_OverlappingWeapon(ABaseWeapon* LastWeapon)
 {
 	if (OverlappingWeapon)
