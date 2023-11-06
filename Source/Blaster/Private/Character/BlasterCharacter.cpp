@@ -51,6 +51,9 @@ ABlasterCharacter::ABlasterCharacter()
 	}
 
 	TurningInPlace = ETurningInPlace::ETIP_NotTurning;
+
+	NetUpdateFrequency = 66.f;
+	MinNetUpdateFrequency = 33.f;
 }
 
 void ABlasterCharacter::Tick(float DeltaTime)
@@ -63,7 +66,7 @@ void ABlasterCharacter::Tick(float DeltaTime)
 void ABlasterCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
+	dfdf
 	DOREPLIFETIME_CONDITION(ABlasterCharacter, OverlappingWeapon, COND_OwnerOnly);
 }
 

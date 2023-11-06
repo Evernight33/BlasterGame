@@ -39,7 +39,7 @@ void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME(UCombatComponent, EquippedWeapon);
 	DOREPLIFETIME(UCombatComponent, bAiming);
 }
-
+ 
 void UCombatComponent::EquipWeapon(ABaseWeapon* WeaponToEquip)
 {
 	if (Character && WeaponToEquip)
