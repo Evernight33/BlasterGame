@@ -42,6 +42,7 @@ ABlasterCharacter::ABlasterCharacter()
 	if (GetCharacterMovement())
 	{
 		GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
+		GetCharacterMovement()->RotationRate = FRotator(0.f, 0.f, 850.f);
 	}
 
 	if (GetCapsuleComponent() && GetMesh())
@@ -245,7 +246,7 @@ void ABlasterCharacter::AimButtonRealeased()
 		Combat->SetAiming(false);
 	}
 }
-PRAGMA_DISABLE_OPTIMIZATION
+
 void ABlasterCharacter::AimOffset(float DeltaTime)
 {
 	if (Combat && Combat->EquippedWeapon)
@@ -294,7 +295,19 @@ void ABlasterCharacter::AimOffset(float DeltaTime)
 		}
 	}
 }
-PRAGMA_ENABLE_OPTIMIZATION
+
+void ABlasterCharacter::Jump()
+{
+	if (bIsCrouched)
+	{
+		UnCrouch();
+	}
+	else
+	{
+		Super::Jump();
+	}
+}
+
 void  ABlasterCharacter::OnRep_OverlappingWeapon(ABaseWeapon* LastWeapon)
 {
 	if (OverlappingWeapon)
