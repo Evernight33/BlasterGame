@@ -165,7 +165,7 @@ void ABlasterCharacter::PostInitializeComponents()
 		Combat->Character = this;
 	}
 }
-
+PRAGMA_DISABLE_OPTIMIZATION
 void ABlasterCharacter::PlayFireMontage(bool bAiming)
 {
 	if (!Combat || !Combat->EquippedWeapon)
@@ -177,16 +177,18 @@ void ABlasterCharacter::PlayFireMontage(bool bAiming)
 	{
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 		{
-			if (AnimInstance->Montage_Play(FireWeaponMontage))
+			if (AnimInstance && FireWeaponMontage)
 			{
+				AnimInstance->Montage_Play(FireWeaponMontage);
+
 				FName SectionName;
 				SectionName = bAiming ? FName("RifleAim") : FName("RifleHip");
-				AnimInstance->Montage_JumpToSection(SectionName, FireWeaponMontage);
+				AnimInstance->Montage_JumpToSection(SectionName);
 			}
 		}
 	}
 }
-
+PRAGMA_ENABLE_OPTIMIZATION
 void ABlasterCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -345,7 +347,7 @@ void ABlasterCharacter::FireButtonReleased()
 {
 	if (Combat)
 	{
-		Combat->FireButtonPressed(true);
+		Combat->FireButtonPressed(false);
 	}
 }
 
