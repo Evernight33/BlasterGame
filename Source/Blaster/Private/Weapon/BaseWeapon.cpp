@@ -6,6 +6,8 @@
 #include "Components/WidgetComponent.h"
 #include "Blaster/Public/Character/BlasterCharacter.h"
 #include "Net/UnrealNetwork.h"
+#include "Animation/AnimationAsset.h"
+#include "Components/SkeletalMeshComponent.h"
 
 ABaseWeapon::ABaseWeapon()
 {
@@ -39,6 +41,14 @@ void ABaseWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifet
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ABaseWeapon, WeaponState)
+}
+
+void ABaseWeapon::Fire()
+{
+	if (FireAnimation && WeaponMesh)
+	{
+		WeaponMesh->PlayAnimation(FireAnimation, false);
+	}
 }
 
 void ABaseWeapon::ShowPickupWidget(bool bShowWidget)

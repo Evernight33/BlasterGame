@@ -8,6 +8,8 @@
 
 class UWidgetComponent;
 class USphereComponent;
+class UAnimationAsset;
+
 UENUM(BlueprintType)
 enum class EWeaponState : uint8
 {
@@ -17,6 +19,7 @@ enum class EWeaponState : uint8
 
 	EWS_MAX UMETA(DisplayName = "DefaultMAX")
 };
+
 UCLASS()
 class BLASTER_API ABaseWeapon : public AActor
 {
@@ -27,6 +30,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	void ShowPickupWidget(bool bShowWidget);
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	void Fire();
 
 protected:
 	virtual void BeginPlay() override;
@@ -60,6 +64,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere, Category = "WeaponProperties")
 	UWidgetComponent* PickupWidget;
+
+	UPROPERTY(EditAnywhere, Category = "Weapon Properties")
+	UAnimationAsset* FireAnimation;
 
 	UFUNCTION()
 	void OnRep_WeaponState();
