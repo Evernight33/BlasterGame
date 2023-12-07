@@ -95,7 +95,20 @@ void UCombatComponent::FireButtonPressed(bool bPressed)
 {
 	bFireButtonPressed = bPressed;
 
-	if (Character && bFireButtonPressed && EquippedWeapon)
+	if (bFireButtonPressed)
+	{
+		ServerFire();
+	}
+}
+
+void UCombatComponent::ServerFire_Implementation()
+{
+	MulticastFire();
+}
+
+void UCombatComponent::MulticastFire_Implementation()
+{
+	if (Character && EquippedWeapon)
 	{
 		Character->PlayFireMontage(bAiming);
 		EquippedWeapon->Fire();
