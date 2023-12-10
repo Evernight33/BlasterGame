@@ -8,10 +8,12 @@
 #include "Components/SphereComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "DrawDebugHelpers.h"
 
 UCombatComponent::UCombatComponent()
 {
-	PrimaryComponentTick.bCanEverTick = false;
+	PrimaryComponentTick.bCanEverTick = true;
 
 	BaseWalkSpeed = 600.f;
 	AimWalkSpeed = 450.f;
@@ -30,6 +32,9 @@ void UCombatComponent::BeginPlay()
 void UCombatComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	FHitResult HitResult;
+	TraceUnderCrosshairs(HitResult);
 }
 
 void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -113,4 +118,49 @@ void UCombatComponent::MulticastFire_Implementation()
 		Character->PlayFireMontage(bAiming);
 		EquippedWeapon->Fire();
 	}
+}
+
+void UCombatComponent::TraceUnderCrosshairs(FHitResult& TraceHitResult)
+{
+	FVector2D ViewportSize;
+
+	if(GEngine && GEngine->GameViewport)
+	{
+		GEngine->GameViewport->GetViewportSize(ViewportSize);
+	}
+
+	FVector2D CrosshairLocation(ViewportSize.X / 2.f, ViewportSize.Y / 2.f);
+
+	FVector CrosshairWorldPosition;
+	FVector CrosshairWorldDirection;
+
+	if (APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0))
+	{
+		bool bScreenToWorld = UGameplayStatics::DeprojectScreenToWorld(
+			PlayerController,
+			CrosshairLocation,
+			CrosshairWorldPosition,
+			CrosshairWorldDirection);
+
+		if (bScreenToWorld)
+		{
+			FVector Start = CrosshairWorldPosition;
+			FVector End = Start + CrosshairWorldDirection * CrosshairTraceLength;
+
+			if (UWorld* World = GetWorld())
+			{
+				World->LineTraceSingleByChannel(TraceHitResult, Start, End, ECollisionChannel::ECC_Visibility);
+
+				if (!TraceHitResult.bBlockingHit)
+				{
+					TraceHitResult.ImpactPoint = End;
+				}
+				else
+				{
+					DrawDebugSphere(World, TraceHitResult.ImpactPoint, 12.f, 12.f, FColor::Red);
+				}
+			}
+		}
+	}
+	
 }

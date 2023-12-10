@@ -41,6 +41,8 @@ protected:
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastFire();
 
+	void TraceUnderCrosshairs(FHitResult& TraceHitResult);
+
 private:
 	UPROPERTY(ReplicatedUsing = OnRep_EquippedWeapon)
 	ABaseWeapon* EquippedWeapon;
@@ -56,4 +58,6 @@ private:
 	float AimWalkSpeed;
 
 	bool bFireButtonPressed;
+
+	float CrosshairTraceLength = 8000.f;
 };
