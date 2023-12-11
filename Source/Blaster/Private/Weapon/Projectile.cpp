@@ -3,6 +3,7 @@
 
 #include "Weapon/Projectile.h"
 #include "Components/BoxComponent.h"
+
 AProjectile::AProjectile()
 {
 	PrimaryActorTick.bCanEverTick = true;

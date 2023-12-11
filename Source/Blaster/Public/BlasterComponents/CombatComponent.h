@@ -60,4 +60,6 @@ private:
 	bool bFireButtonPressed;
 
 	float CrosshairTraceLength = 8000.f;
+
+	FVector HitTarget;
 };

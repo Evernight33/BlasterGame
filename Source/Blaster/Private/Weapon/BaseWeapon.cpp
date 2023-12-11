@@ -43,7 +43,7 @@ void ABaseWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifet
 	DOREPLIFETIME(ABaseWeapon, WeaponState)
 }
 
-void ABaseWeapon::Fire()
+void ABaseWeapon::Fire(const FVector& HitTarget)
 {
 	if (FireAnimation && WeaponMesh)
 	{
