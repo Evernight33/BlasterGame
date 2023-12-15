@@ -30,7 +30,7 @@ void AProjectileWeapon::Fire(const FVector& HitTarget)
 
 					if (UWorld* World = GetWorld())
 					{
-						World->SpawnActor<AProjectileWeapon>(
+						World->SpawnActor<AProjectile>(
 							ProjectileClass,
 							SocketTransform.GetLocation(),
 							TargetRotation,
