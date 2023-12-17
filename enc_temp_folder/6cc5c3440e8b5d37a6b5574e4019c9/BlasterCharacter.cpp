@@ -165,7 +165,7 @@ void ABlasterCharacter::PostInitializeComponents()
 		Combat->Character = this;
 	}
 }
-
+PRAGMA_DISABLE_OPTIMIZATION
 void ABlasterCharacter::PlayFireMontage(bool bAiming)
 {
 	if (!Combat || !Combat->EquippedWeapon)
@@ -188,7 +188,7 @@ void ABlasterCharacter::PlayFireMontage(bool bAiming)
 		}
 	}
 }
-
+PRAGMA_ENABLE_OPTIMIZATION
 void ABlasterCharacter::BeginPlay()
 {
 	Super::BeginPlay();
