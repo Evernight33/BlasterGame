@@ -66,5 +66,11 @@ private:
 
 	bool bFireButtonPressed;
 
+	/*
+	* Hud and crosshairs
+	*/
+
 	float CrosshairTraceLength = 8000.f;
+	float CrosshairVelocityFactor;
+	float CrosshairAirFactor;
 };
