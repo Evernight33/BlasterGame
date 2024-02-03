@@ -70,6 +70,8 @@ private:
 	* Hud and crosshairs
 	*/
 
+	FVector HitTarget;
+
 	float CrosshairTraceLength = 8000.f;
 	float CrosshairVelocityFactor;
 	float CrosshairAirFactor;

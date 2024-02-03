@@ -39,6 +39,7 @@ public:
 	FORCEINLINE ETurningInPlace GetTurningInPlace() const { return TurningInPlace; };
 
 	ABaseWeapon* GetEquippedWeapon();
+	FVector GetHitTarget() const;
 
 protected:
 	virtual void BeginPlay() override;

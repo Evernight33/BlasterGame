@@ -371,3 +371,13 @@ void ABlasterCharacter::ServerEquipButtonPressed_Implementation()
 		Combat->EquipWeapon(OverlappingWeapon);
 	}
 }
+
+FVector ABlasterCharacter::GetHitTarget() const
+{
+	if (!Combat)
+	{
+		return FVector();
+	}
+
+	return Combat->HitTarget;
+}
