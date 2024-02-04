@@ -12,6 +12,7 @@ class UWidgetComponent;
 class ABaseWeapon;
 class UCombatComponent;
 class UAnimMontage;
+class UCameraComponent;
 
 UCLASS()
 class BLASTER_API ABlasterCharacter : public ACharacter
@@ -36,7 +37,8 @@ public:
 
 	FORCEINLINE float GetAO_Yaw() const { return AO_Yaw; }
 	FORCEINLINE float GetAO_Pitch() const { return AO_Pitch; }
-	FORCEINLINE ETurningInPlace GetTurningInPlace() const { return TurningInPlace; };
+	FORCEINLINE ETurningInPlace GetTurningInPlace() const { return TurningInPlace; }
+	FORCEINLINE UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
 	ABaseWeapon* GetEquippedWeapon();
 	FVector GetHitTarget() const;
