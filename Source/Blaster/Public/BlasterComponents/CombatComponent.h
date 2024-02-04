@@ -75,6 +75,8 @@ private:
 	float CrosshairTraceLength = 8000.f;
 	float CrosshairVelocityFactor;
 	float CrosshairAirFactor;
+	float CrosshairAimFactor;
+	float CrosshairShootingFactor;
 
 	/*
 	* Aiming and FOV
