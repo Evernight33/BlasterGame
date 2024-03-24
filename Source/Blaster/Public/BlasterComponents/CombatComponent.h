@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "HUD/BlasterHUD.h"
 #include "CombatComponent.generated.h"
 
 class ABaseWeapon;
@@ -71,6 +72,7 @@ private:
 	*/
 
 	FVector HitTarget;
+	FHUDPackage HUDPackage;
 
 	float CrosshairTraceLength = 8000.f;
 	float CrosshairVelocityFactor;

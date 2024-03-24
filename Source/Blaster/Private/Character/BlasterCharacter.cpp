@@ -13,6 +13,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Blaster/Public/Character/BlasterAnimInstance.h"
 
+
 ABlasterCharacter::ABlasterCharacter()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
@@ -49,6 +50,8 @@ ABlasterCharacter::ABlasterCharacter()
 	if (GetCapsuleComponent() && GetMesh())
 	{
 		GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
+		GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
+
 		GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 	}
 

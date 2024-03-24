@@ -10,13 +10,14 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Weapon/BulletShell.h"
 #include "Engine/SkeletalMeshSocket.h"
+#include "UObject/Object.h"
 
 ABaseWeapon::ABaseWeapon()
 {
 	PrimaryActorTick.bCanEverTick = false;
 	bReplicates = true;
-
-	WeaponMesh = CreateAbstractDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponMesh"));
+	
+	WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponMesh"));
 	SetRootComponent(WeaponMesh);
 	//WeaponMesh->SetupAttachment(RootComponent);
 	
