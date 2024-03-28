@@ -22,6 +22,7 @@ class BLASTER_API ABlasterCharacter : public ACharacter, public IInteractWithCro
 
 private:
 	void TurnInPlace(float DeltaTime);
+	void TryToHideACamera();
 
 public:
 	ABlasterCharacter();
@@ -87,6 +88,10 @@ private:
 	float AO_Yaw;
 	float AO_Pitch;
 	float InterpAO_Yaw;
+
+	UPROPERTY(EditAnywhere)
+	float CameraThreshold = 200.0f;
+
 	FRotator StartingAimRotation;
 
 	ETurningInPlace TurningInPlace;
