@@ -23,8 +23,11 @@ void AProjectileWeapon::Fire(const FVector& HitTarget)
 			{
 				FTransform SocketTransform = MuzzleFlashSocket->GetSocketTransform(WeaponMeshSuper);
 
+				FVector ProjectileSpawnLocation = SocketTransform.GetLocation();
+				ProjectileSpawnLocation.Z += 100;
+
 				// Vector from weapon muzzle to hit location
-				FVector ToTarget = HitTarget - SocketTransform.GetLocation();
+				FVector ToTarget = HitTarget - ProjectileSpawnLocation;
 				FRotator TargetRotation = ToTarget.Rotation();
 
 				if (ProjectileClass && InstigatorPawn)
@@ -37,7 +40,7 @@ void AProjectileWeapon::Fire(const FVector& HitTarget)
 					{
 						World->SpawnActor<AProjectile>(
 							ProjectileClass,
-							SocketTransform.GetLocation(),
+							ProjectileSpawnLocation,
 							TargetRotation,
 							SpawnParams);
 					}

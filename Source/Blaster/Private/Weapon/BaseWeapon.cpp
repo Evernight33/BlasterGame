@@ -52,7 +52,7 @@ void ABaseWeapon::Fire(const FVector& HitTarget)
 	{
 		WeaponMesh->PlayAnimation(FireAnimation, false);
 
-		if (const USkeletalMeshSocket* AmmoEjectSocket = WeaponMesh->GetSocketByName(FName("AmmoEject")))
+		if (const USkeletalMeshSocket* AmmoEjectSocket = WeaponMesh->GetSocketByName(FName("ProjectileStart")))
 		{
 			FTransform SocketTransform = AmmoEjectSocket->GetSocketTransform(WeaponMesh);
 			
