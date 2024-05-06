@@ -185,7 +185,8 @@ void UCombatComponent::TraceUnderCrosshairs(FHitResult& TraceHitResult)
 				{
 					TraceHitResult.ImpactPoint = End;
 				}
-
+				if (TraceHitResult.GetActor())
+					UE_LOG(LogTemp, Display, TEXT("Trace Actor: %s"), *TraceHitResult.GetActor()->GetName());
 				if (TraceHitResult.GetActor() && TraceHitResult.GetActor()->Implements<UInteractWithCrosshairsInterface>())
 				{
 					HUDPackage.CrosshairsColor = FLinearColor::Red;

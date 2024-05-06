@@ -23,6 +23,7 @@ class BLASTER_API ABlasterCharacter : public ACharacter, public IInteractWithCro
 private:
 	void TurnInPlace(float DeltaTime);
 	void TryToHideACamera();
+	void PlayHitReactMontage();
 
 public:
 	ABlasterCharacter();
@@ -44,6 +45,9 @@ public:
 
 	ABaseWeapon* GetEquippedWeapon();
 	FVector GetHitTarget() const;
+
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastHit();
 
 protected:
 	virtual void BeginPlay() override;
@@ -98,4 +102,7 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = Combat)
 	UAnimMontage* FireWeaponMontage;
+
+	UPROPERTY(EditAnywhere, Category = Combat)
+	UAnimMontage* HitReactMontage;
 };

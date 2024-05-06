@@ -12,6 +12,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Blaster/Public/Character/BlasterAnimInstance.h"
+#include "Blaster.h"
 
 
 ABlasterCharacter::ABlasterCharacter()
@@ -53,6 +54,9 @@ ABlasterCharacter::ABlasterCharacter()
 		GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
 
 		GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
+		GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Visibility, ECollisionResponse::ECR_Block);
+
+		GetMesh()->SetCollisionObjectType(ECC_SkeletalMesh);
 	}
 
 	TurningInPlace = ETurningInPlace::ETIP_NotTurning;
@@ -142,6 +146,11 @@ void ABlasterCharacter::TryToHideACamera()
 	}
 }
 
+void ABlasterCharacter::MulticastHit_Implementation()
+{
+	PlayHitReactMontage();
+}
+
 bool ABlasterCharacter::IsWeaponEquipped()
 {
 	return (Combat && Combat->EquippedWeapon);
@@ -203,15 +212,36 @@ void ABlasterCharacter::PlayFireMontage(bool bAiming)
 	if (GetMesh())
 	{
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-		{
-			if (AnimInstance && FireWeaponMontage)
-			{
-				AnimInstance->Montage_Play(FireWeaponMontage);
 
-				FName SectionName;
-				SectionName = bAiming ? FName("RifleAim") : FName("RifleHip");
-				AnimInstance->Montage_JumpToSection(SectionName);
-			}
+		if (AnimInstance && FireWeaponMontage)
+		{
+			AnimInstance->Montage_Play(FireWeaponMontage);
+
+			FName SectionName;
+			SectionName = bAiming ? FName("RifleAim") : FName("RifleHip");
+			AnimInstance->Montage_JumpToSection(SectionName);
+		}
+	}
+}
+
+void ABlasterCharacter::PlayHitReactMontage()
+{
+	if (!Combat || !Combat->EquippedWeapon)
+	{
+		return;
+	}
+
+	if (GetMesh())
+	{
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+
+		if (AnimInstance && HitReactMontage)
+		{
+			float var = AnimInstance->Montage_Play(HitReactMontage);
+
+			FName SectionName;
+			SectionName = FName("FromFront");
+			AnimInstance->Montage_JumpToSection(SectionName);
 		}
 	}
 }
