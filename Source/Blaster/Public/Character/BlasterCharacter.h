@@ -32,6 +32,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void PostInitializeComponents() override;
+	virtual void OnRep_ReplicatedMovement() override;
 
 	void PlayFireMontage(bool bAiming);
 	void SetOverlappingWeapon(ABaseWeapon* Weapon);
@@ -42,6 +43,7 @@ public:
 	FORCEINLINE float GetAO_Pitch() const { return AO_Pitch; }
 	FORCEINLINE ETurningInPlace GetTurningInPlace() const { return TurningInPlace; }
 	FORCEINLINE UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+	FORCEINLINE bool GetShouldRotateRootBone() { return bRotateRootBone; };
 
 	ABaseWeapon* GetEquippedWeapon();
 	FVector GetHitTarget() const;
@@ -61,6 +63,7 @@ protected:
 	void AimButtonPressed();
 	void AimButtonRealeased();
 	void AimOffset(float DeltaTime);
+	void SimProxiesTurn();
 
 	virtual void Jump() override;
 	
@@ -83,6 +86,9 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	UCombatComponent* Combat;
 
+	void CalculateAO_Pitch();
+	float CalculateSpeed();
+
 	UFUNCTION()
 	void OnRep_OverlappingWeapon(ABaseWeapon* LastWeapon);
 
@@ -92,6 +98,15 @@ private:
 	float AO_Yaw;
 	float AO_Pitch;
 	float InterpAO_Yaw;
+	
+	bool bRotateRootBone;
+	float TurnThreshold = 0.5f;
+
+	FRotator ProxyRotationLastFrame;
+	FRotator ProxyRotationCurrentFrame;
+
+	float ProxyYaw;
+	float TimeSinceLastMovementRep;
 
 	UPROPERTY(EditAnywhere)
 	float CameraThreshold = 200.0f;
