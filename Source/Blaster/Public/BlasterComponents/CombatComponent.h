@@ -79,7 +79,7 @@ private:
 	float CrosshairAirFactor;
 	float CrosshairAimFactor;
 	float CrosshairShootingFactor;
-
+	float CrosshairEnemyFactor;
 	/*
 	* Aiming and FOV
 	*/
