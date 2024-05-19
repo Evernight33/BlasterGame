@@ -70,7 +70,6 @@ private:
 	/*
 	* Hud and crosshairs
 	*/
-
 	FVector HitTarget;
 	FHUDPackage HUDPackage;
 
@@ -80,10 +79,10 @@ private:
 	float CrosshairAimFactor;
 	float CrosshairShootingFactor;
 	float CrosshairEnemyFactor;
+
 	/*
 	* Aiming and FOV
 	*/
-	
 	float DefaultFOV;
 	float CurrentFOV;
 	UPROPERTY(EditAnywhere, Category = Combat)
@@ -93,4 +92,12 @@ private:
 	float ZoomInterpSpeed = 20.f;
 
 	void InterpFOV(float DeltaTime);
+
+	FTimerHandle FireTimer;
+
+	bool bCanfire = true;
+
+	void StartFireTimer();
+	void FireTimerFinished();
+	void Fire();
 };
