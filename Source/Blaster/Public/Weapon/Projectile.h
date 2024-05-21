@@ -42,7 +42,19 @@ private:
 	UParticleSystem* ImpactParticles;
 
 	UPROPERTY(EditAnywhere)
+	UParticleSystem* ImpactCharacterParticles;
+
+	UPROPERTY(EditAnywhere)
+	UParticleSystem* ImpactStoneParticles;
+
+	UPROPERTY(EditAnywhere)
 	USoundCue* ImpactSound;
+
+	UPROPERTY(EditAnywhere)
+	USoundCue* ImpactCharacterSound;
+
+	bool bImpactCharacter = false;
+	bool bImpactStone = false;
 
 public:	
 	virtual void Tick(float DeltaTime) override;

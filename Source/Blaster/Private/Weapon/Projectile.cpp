@@ -53,10 +53,18 @@ void AProjectile::BeginPlay()
 
 void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
+	bImpactCharacter = false;
+	bImpactStone = false;
+
 	ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(OtherActor);
 	if (BlasterCharacter)
 	{
 		BlasterCharacter->MulticastHit();
+		bImpactCharacter = true;		
+	}
+	else if (OtherActor->GetName().Contains(TEXT("SM_Kit_Wall_Straight")))
+	{
+		bImpactStone = true;
 	}
 
 	Destroy();
@@ -73,10 +81,25 @@ void AProjectile::Destroyed()
 
 	if (ImpactParticles && GetWorld())
 	{
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, GetActorTransform());
+		if (bImpactCharacter)
+		{
+			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactCharacterParticles, GetActorTransform());
+		}
+		else if(bImpactStone)
+		{
+			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactStoneParticles, GetActorTransform());
+		}
+		else
+		{
+			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactParticles, GetActorTransform());
+		}
 	}
 
-	if (ImpactSound)
+	if (ImpactCharacterSound && bImpactCharacter)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, ImpactCharacterSound, GetActorLocation());
+	}
+	else if (ImpactSound)
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation());
 	}
