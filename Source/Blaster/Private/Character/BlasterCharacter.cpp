@@ -13,7 +13,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Blaster/Public/Character/BlasterAnimInstance.h"
 #include "Blaster.h"
-
+#include "BlasterPlayerController.h"
 
 ABlasterCharacter::ABlasterCharacter()
 {
@@ -270,7 +270,13 @@ void ABlasterCharacter::PlayHitReactMontage()
 void ABlasterCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	BlasterPlayerController = Cast<ABlasterPlayerController>(Controller);
+
+	if (BlasterPlayerController)
+	{
+		BlasterPlayerController->SetHUDHealth(Health, MaxHealth);
+	}
 }
 
 void ABlasterCharacter::MoveForward(float Value)

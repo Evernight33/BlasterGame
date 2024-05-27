@@ -14,6 +14,7 @@ class ABaseWeapon;
 class UCombatComponent;
 class UAnimMontage;
 class UCameraComponent;
+class ABlasterPlayerController;
 
 UCLASS()
 class BLASTER_API ABlasterCharacter : public ACharacter, public IInteractWithCrosshairsInterface
@@ -120,6 +121,8 @@ private:
 
 	float ProxyYaw;
 	float TimeSinceLastMovementRep;
+
+	ABlasterPlayerController* BlasterPlayerController;
 
 	UPROPERTY(EditAnywhere)
 	float CameraThreshold = 200.0f;
