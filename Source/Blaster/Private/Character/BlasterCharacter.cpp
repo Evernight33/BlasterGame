@@ -14,6 +14,7 @@
 #include "Blaster/Public/Character/BlasterAnimInstance.h"
 #include "Blaster.h"
 #include "BlasterPlayerController.h"
+#include "Blaster/Public/GameMode/BlasterGameMode.h"
 
 ABlasterCharacter::ABlasterCharacter()
 {
@@ -108,6 +109,11 @@ void ABlasterCharacter::SetOverlappingWeapon(ABaseWeapon* Weapon)
 			OverlappingWeapon->ShowPickupWidget(true);
 		}
 	}
+}
+
+void ABlasterCharacter::Eliminate()
+{
+
 }
 
 void ABlasterCharacter::TurnInPlace(float DeltaTime)
@@ -464,6 +470,17 @@ void ABlasterCharacter::ReceiveDamage(AActor* DamagedActor, float Damage, const 
 
 	UpdateHUDHealth();
 	PlayHitReactMontage();	
+	
+	if (Health == 0.0f)
+	{
+		ABlasterGameMode* BlasterGameMode = GetWorld()->GetAuthGameMode<ABlasterGameMode>();
+		if (BlasterGameMode)
+		{
+			BlasterPlayerController = !BlasterPlayerController ? Cast<ABlasterPlayerController>(Controller) : BlasterPlayerController;
+			ABlasterPlayerController* BlasterInstigatorController = Cast<ABlasterPlayerController>(InstigatorController);
+			BlasterGameMode->PlayerEliminated(this, BlasterPlayerController, BlasterInstigatorController);
+		}
+	}
 }
 
 void ABlasterCharacter::UpdateHUDHealth()

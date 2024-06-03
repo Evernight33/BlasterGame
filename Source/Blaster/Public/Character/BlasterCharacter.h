@@ -37,6 +37,8 @@ public:
 
 	void PlayFireMontage(bool bAiming);
 	void SetOverlappingWeapon(ABaseWeapon* Weapon);
+	void Eliminate();
+
 	bool IsWeaponEquipped();
 	bool IsAiming();
 
