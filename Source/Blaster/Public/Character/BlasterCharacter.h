@@ -15,7 +15,7 @@ class UCombatComponent;
 class UAnimMontage;
 class UCameraComponent;
 class ABlasterPlayerController;
-
+class AController;
 UCLASS()
 class BLASTER_API ABlasterCharacter : public ACharacter, public IInteractWithCrosshairsInterface
 {
@@ -49,9 +49,6 @@ public:
 	ABaseWeapon* GetEquippedWeapon();
 	FVector GetHitTarget() const;
 
-	UFUNCTION(NetMulticast, Unreliable)
-	void MulticastHit();
-
 protected:
 	virtual void BeginPlay() override;
 
@@ -66,6 +63,10 @@ protected:
 	void AimOffset(float DeltaTime);
 	void SimProxiesTurn();
 
+	UFUNCTION()
+	void ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatorController, AActor* DamageCauser);
+
+	void UpdateHUDHealth();
 	virtual void Jump() override;
 	
 	void FireButtonPressed();

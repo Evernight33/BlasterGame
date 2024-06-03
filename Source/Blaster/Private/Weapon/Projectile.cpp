@@ -59,8 +59,8 @@ void AProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimi
 	ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(OtherActor);
 	if (BlasterCharacter)
 	{
-		BlasterCharacter->MulticastHit();
-		bImpactCharacter = true;		
+		//BlasterCharacter->MulticastHit();
+		bImpactCharacter = true;
 	}
 	else if (OtherActor->GetName().Contains(TEXT("SM_Kit_Wall_Straight")))
 	{
