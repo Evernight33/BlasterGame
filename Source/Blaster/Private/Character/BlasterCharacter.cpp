@@ -111,9 +111,20 @@ void ABlasterCharacter::SetOverlappingWeapon(ABaseWeapon* Weapon)
 	}
 }
 
-void ABlasterCharacter::Eliminate()
+void ABlasterCharacter::PlayElimintationMontage()
 {
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 
+	if (AnimInstance && EliminationMontage)
+	{
+		AnimInstance->Montage_Play(EliminationMontage);
+	}
+}
+
+void ABlasterCharacter::Eliminate_Implementation()
+{
+	bEliminated = true;
+	PlayElimintationMontage();
 }
 
 void ABlasterCharacter::TurnInPlace(float DeltaTime)

@@ -37,6 +37,9 @@ public:
 
 	void PlayFireMontage(bool bAiming);
 	void SetOverlappingWeapon(ABaseWeapon* Weapon);
+	void PlayElimintationMontage();
+
+	UFUNCTION(NetMulticast, Reliable)
 	void Eliminate();
 
 	bool IsWeaponEquipped();
@@ -47,6 +50,7 @@ public:
 	FORCEINLINE ETurningInPlace GetTurningInPlace() const { return TurningInPlace; }
 	FORCEINLINE UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 	FORCEINLINE bool GetShouldRotateRootBone() { return bRotateRootBone; };
+	FORCEINLINE bool IsEliminated() const { return bEliminated; }
 
 	ABaseWeapon* GetEquippedWeapon();
 	FVector GetHitTarget() const;
@@ -117,6 +121,7 @@ private:
 	float InterpAO_Yaw;
 	
 	bool bRotateRootBone;
+	bool bEliminated;
 	float TurnThreshold = 0.5f;
 
 	FRotator ProxyRotationLastFrame;
@@ -139,4 +144,7 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = Combat)
 	UAnimMontage* HitReactMontage;
+
+	UPROPERTY(EditAnywhere, Category = Combat)
+	UAnimMontage* EliminationMontage;
 };
