@@ -8,6 +8,7 @@
 
 class ABlasterCharacter;
 class ABlasterPlayerController;
+class ACharacter;
 
 UCLASS()
 class BLASTER_API ABlasterGameMode : public AGameMode
@@ -15,4 +16,5 @@ class BLASTER_API ABlasterGameMode : public AGameMode
 	GENERATED_BODY()
 public:
 	virtual void PlayerEliminated(ABlasterCharacter* ElimmedCharacter, ABlasterPlayerController* VictimController, ABlasterPlayerController* AttackerController);
+	virtual void RequestRespawn(ACharacter* EliminatedCharacter, AController* EliminatedController);
 };

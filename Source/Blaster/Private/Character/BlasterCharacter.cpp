@@ -14,6 +14,7 @@
 #include "Blaster/Public/Character/BlasterAnimInstance.h"
 #include "Blaster.h"
 #include "BlasterPlayerController.h"
+#include "TimerManager.h"
 #include "Blaster/Public/GameMode/BlasterGameMode.h"
 
 ABlasterCharacter::ABlasterCharacter()
@@ -61,9 +62,12 @@ ABlasterCharacter::ABlasterCharacter()
 	}
 
 	TurningInPlace = ETurningInPlace::ETIP_NotTurning;
+	SpawnCollisionHandlingMethod = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 
 	NetUpdateFrequency = 66.f;
 	MinNetUpdateFrequency = 33.f;
+
+	
 }
 
 void ABlasterCharacter::Tick(float DeltaTime)
@@ -121,7 +125,18 @@ void ABlasterCharacter::PlayElimintationMontage()
 	}
 }
 
-void ABlasterCharacter::Eliminate_Implementation()
+void ABlasterCharacter::Eliminate()
+{
+	MulticastEliminate();
+
+	GetWorldTimerManager().SetTimer(
+		EliminateTimer,
+		this,
+		&ABlasterCharacter::EliminateTimerFinished,
+		EliminateDelay);
+}
+
+void ABlasterCharacter::MulticastEliminate_Implementation()
 {
 	bEliminated = true;
 	PlayElimintationMontage();
@@ -482,7 +497,7 @@ void ABlasterCharacter::ReceiveDamage(AActor* DamagedActor, float Damage, const 
 	UpdateHUDHealth();
 	PlayHitReactMontage();	
 	
-	if (Health == 0.0f)
+	if (Health == 0.0f && GetWorld())
 	{
 		ABlasterGameMode* BlasterGameMode = GetWorld()->GetAuthGameMode<ABlasterGameMode>();
 		if (BlasterGameMode)
@@ -556,6 +571,19 @@ void ABlasterCharacter::ServerEquipButtonPressed_Implementation()
 	if (Combat)
 	{
 		Combat->EquipWeapon(OverlappingWeapon);
+	}
+}
+
+void ABlasterCharacter::EliminateTimerFinished()
+{
+	if (GetWorld())
+	{
+		ABlasterGameMode* BlasterGameMode = GetWorld()->GetAuthGameMode<ABlasterGameMode>();
+
+		if (BlasterGameMode)
+		{
+			BlasterGameMode->RequestRespawn(this, Controller);
+		}
 	}
 }
 

@@ -38,9 +38,10 @@ public:
 	void PlayFireMontage(bool bAiming);
 	void SetOverlappingWeapon(ABaseWeapon* Weapon);
 	void PlayElimintationMontage();
+	void Eliminate();
 
 	UFUNCTION(NetMulticast, Reliable)
-	void Eliminate();
+	void MulticastEliminate();	
 
 	bool IsWeaponEquipped();
 	bool IsAiming();
@@ -116,6 +117,8 @@ private:
 	UFUNCTION(Server, Reliable)
 	void ServerEquipButtonPressed();
 
+	void EliminateTimerFinished();
+
 	float AO_Yaw;
 	float AO_Pitch;
 	float InterpAO_Yaw;
@@ -130,10 +133,15 @@ private:
 	float ProxyYaw;
 	float TimeSinceLastMovementRep;
 
+	FTimerHandle EliminateTimer;
+
 	ABlasterPlayerController* BlasterPlayerController;
 
 	UPROPERTY(EditAnywhere)
 	float CameraThreshold = 200.0f;
+
+	UPROPERTY(EditDefaultsOnly)
+	float EliminateDelay = 3.0f;
 
 	FRotator StartingAimRotation;
 
