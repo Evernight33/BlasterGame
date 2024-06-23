@@ -153,6 +153,11 @@ void ABlasterCharacter::Eliminate()
 		this,
 		&ABlasterCharacter::EliminateTimerFinished,
 		EliminateDelay);
+
+	if (Combat && Combat->EquippedWeapon)
+	{
+		Combat->EquippedWeapon->DropWeapon();
+	}
 }
 
 void ABlasterCharacter::MulticastEliminate_Implementation()
@@ -172,6 +177,23 @@ void ABlasterCharacter::MulticastEliminate_Implementation()
 
 			StartDissolve();
 		}
+	}
+
+	// Disable movement, rotation and collision after death
+	if (UCharacterMovementComponent* MovementComponent = GetCharacterMovement())
+	{
+		MovementComponent->DisableMovement();
+		MovementComponent->StopMovementImmediately();
+	}
+
+	if (BlasterPlayerController)
+	{
+		DisableInput(BlasterPlayerController);
+	}
+
+	if (GetCapsuleComponent())
+	{
+		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
 }
 
