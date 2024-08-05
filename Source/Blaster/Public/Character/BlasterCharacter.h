@@ -17,6 +17,8 @@ class UAnimMontage;
 class UCameraComponent;
 class ABlasterPlayerController;
 class AController;
+class USoundCue;
+
 UCLASS()
 class BLASTER_API ABlasterCharacter : public ACharacter, public IInteractWithCrosshairsInterface
 {
@@ -35,6 +37,7 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void PostInitializeComponents() override;
 	virtual void OnRep_ReplicatedMovement() override;
+	virtual void Destroyed() override;
 
 	void PlayFireMontage(bool bAiming);
 	void SetOverlappingWeapon(ABaseWeapon* Weapon);
@@ -131,6 +134,19 @@ private:
 	//Material instance set by default in BP
 	UPROPERTY(EditAnywhere, Category = Elim)
 	UMaterialInstance* DissolveMaterialInstance;
+
+	/*
+	* Elimination bot
+	*/
+
+	UPROPERTY(EditAnywhere)
+	UParticleSystem* ElimBotEffect;
+
+	UPROPERTY(VisibleAnywhere)
+	UParticleSystemComponent* ElimBotComponent;
+
+	UPROPERTY(EditAnywhere)
+	USoundCue* ElimBotSound;
 
 	UFUNCTION()
 	void UpdateDissolveMaterial(float DissolveValue);

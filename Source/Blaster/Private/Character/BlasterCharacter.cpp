@@ -16,6 +16,9 @@
 #include "BlasterPlayerController.h"
 #include "TimerManager.h"
 #include "Blaster/Public/GameMode/BlasterGameMode.h"
+#include "Kismet/GameplayStatics.h"
+#include "Sound/SoundCue.h"
+#include "Particles/ParticleSystemComponent.h"
 
 ABlasterCharacter::ABlasterCharacter()
 {
@@ -195,6 +198,27 @@ void ABlasterCharacter::MulticastEliminate_Implementation()
 	{
 		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	}
+
+	// Spawn elimination bot
+	if (ElimBotEffect)
+	{
+		FVector ElimBotSpawnPoint(GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z + 200.f);
+		ElimBotComponent = UGameplayStatics::SpawnEmitterAtLocation(
+			GetWorld(), 
+			ElimBotEffect,
+			ElimBotSpawnPoint,
+			GetActorRotation()                                                                                   
+		);
+	}
+
+	if (ElimBotSound)
+	{
+		UGameplayStatics::SpawnSoundAtLocation(
+			this,
+			ElimBotSound,
+			GetActorLocation()
+		);
+	}
 }
 
 void ABlasterCharacter::TurnInPlace(float DeltaTime)
@@ -303,6 +327,16 @@ void ABlasterCharacter::OnRep_ReplicatedMovement()
 
 	SimProxiesTurn();
 	TimeSinceLastMovementRep = 0.0f;
+}
+
+void ABlasterCharacter::Destroyed()
+{
+	Super::Destroyed();
+
+	if (ElimBotComponent)
+	{
+		ElimBotComponent->DestroyComponent();
+	}
 }
 
 void ABlasterCharacter::PlayFireMontage(bool bAiming)
@@ -638,6 +672,11 @@ void ABlasterCharacter::EliminateTimerFinished()
 		if (BlasterGameMode)
 		{
 			BlasterGameMode->RequestRespawn(this, Controller);
+		}		
+
+		if (ElimBotComponent)
+		{
+			ElimBotComponent->DestroyComponent();
 		}
 	}
 }
