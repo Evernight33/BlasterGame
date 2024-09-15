@@ -10,8 +10,9 @@ void ABlasterPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(ABlasterPlayerState, Defeats);
+	DOREPLIFETIME(ABlasterPlayerState, IsVisibleElimText);
 }
-PRAGMA_DISABLE_OPTIMIZATION
+
 void ABlasterPlayerState::OnRep_Score()
 {
 	Super::OnRep_Score();
@@ -36,6 +37,19 @@ void ABlasterPlayerState::OnRep_Defeats()
 		if (Controller)
 		{
 			Controller->SetHUDDefeats(Defeats);
+		}
+	}
+}
+
+void ABlasterPlayerState::OnRep_ElimText()
+{
+	Character = !Character ? Cast<ABlasterCharacter>(GetPawn()) : Character;
+	if (Character)
+	{
+		Controller = !Controller ? Cast<ABlasterPlayerController>(Character->GetController()) : Controller;
+		if (Controller)
+		{
+			Controller->SetElimTextVisibility(IsVisibleElimText);
 		}
 	}
 }
@@ -68,4 +82,17 @@ void ABlasterPlayerState::AddToDefeats(int32 DefeatsAmount)
 		}
 	}
 }
-PRAGMA_ENABLE_OPTIMIZATION
+
+void ABlasterPlayerState::ElimTextVisibility(bool IsVisible)
+{
+	Character = !Character ? Cast<ABlasterCharacter>(GetPawn()) : Character;
+	if (Character)
+	{
+		Controller = !Controller ? Cast <ABlasterPlayerController>(Character->GetController()) : Controller;
+		if (Controller)
+		{
+			Controller->SetElimTextVisibility(IsVisible);
+			IsVisibleElimText = IsVisible;
+		}
+	}
+}

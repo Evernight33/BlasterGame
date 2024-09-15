@@ -20,6 +20,7 @@ void ABlasterGameMode::PlayerEliminated(ABlasterCharacter* ElimmedCharacter, ABl
 	if (VictimPlayerState)
 	{
 		VictimPlayerState->AddToDefeats(1);
+		VictimPlayerState->ElimTextVisibility(true);
 	}
 	if (ElimmedCharacter)
 	{
@@ -41,5 +42,14 @@ void ABlasterGameMode::RequestRespawn(ACharacter* EliminatedCharacter, AControll
 		UGameplayStatics::GetAllActorsOfClass(this, APlayerStart::StaticClass(), PlayerStarts);
 		int32 Selection = FMath::RandRange(0, PlayerStarts.Num() - 1);
 		RestartPlayerAtPlayerStart(EliminatedController, PlayerStarts[Selection]);
+
+		if (EliminatedCharacter->GetPlayerState())
+		{
+			ABlasterPlayerState* EliminatedCharPlayerState = Cast<ABlasterPlayerState>(EliminatedCharacter->GetPlayerState());
+			if (EliminatedCharPlayerState)
+			{
+				EliminatedCharPlayerState->ElimTextVisibility(false);
+			}
+		}
 	}
 }

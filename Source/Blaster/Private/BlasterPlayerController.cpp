@@ -54,6 +54,24 @@ void ABlasterPlayerController::SetHUDDefeats(int32 Defeats)
 	}
 }
 
+void ABlasterPlayerController::SetElimTextVisibility(bool IsVisible)
+{
+	BlasterHUD = !BlasterHUD ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
+
+	if (BlasterHUD && BlasterHUD->CharacterOverlay
+		&& BlasterHUD->CharacterOverlay->ElimText)
+	{
+		if (IsVisible)
+		{
+			BlasterHUD->CharacterOverlay->ElimText->SetVisibility(ESlateVisibility::Visible);
+		}
+		else
+		{
+			BlasterHUD->CharacterOverlay->ElimText->SetVisibility(ESlateVisibility::Collapsed);
+		}
+	}
+}
+
 void ABlasterPlayerController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);

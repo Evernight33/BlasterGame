@@ -16,6 +16,7 @@ public:
 	void SetHUDHealth(float CurrentHealth, float MaxHealth);
 	void SetHUDScore(float Score);
 	void SetHUDDefeats(int32 Defeats);
+	void SetElimTextVisibility(bool IsVisible);
 
 	virtual void OnPossess(APawn* InPawn) override;
 

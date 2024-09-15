@@ -625,6 +625,7 @@ void ABlasterCharacter::PollInit()
 		{
 			BlasterPlayerState->AddToScore(0.0f, true);
 			BlasterPlayerState->AddToDefeats(0);
+			BlasterPlayerState->ElimTextVisibility(false);
 		}
 	}
 }

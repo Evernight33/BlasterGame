@@ -21,8 +21,12 @@ public:
 	UFUNCTION()
 	virtual void OnRep_Defeats();
 
+	UFUNCTION()
+	virtual void OnRep_ElimText();
+
 	void AddToScore(float ScoreAmount, bool IsInit = false);
 	void AddToDefeats(int32 DefeatsAmount);
+	void ElimTextVisibility(bool IsVisible);
 
 private:
 	UPROPERTY()
@@ -32,5 +36,8 @@ private:
 	ABlasterPlayerController* Controller;	
 
 	UPROPERTY(ReplicatedUsing = OnRep_Defeats)
-	int32 Defeats;
+	int32 Defeats;	
+
+	UPROPERTY(ReplicatedUsing = OnRep_ElimText)
+	bool IsVisibleElimText;
 };
