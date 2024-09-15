@@ -19,6 +19,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundCue.h"
 #include "Particles/ParticleSystemComponent.h"
+#include "Blaster/Public/PlayerState/BlasterPlayerState.h"
 
 ABlasterCharacter::ABlasterCharacter()
 {
@@ -52,7 +53,7 @@ ABlasterCharacter::ABlasterCharacter()
 		GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
 		GetCharacterMovement()->RotationRate = FRotator(0.f, 0.f, 850.f);
 	}
-
+	
 	if (GetCapsuleComponent() && GetMesh())
 	{
 		GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
@@ -90,7 +91,9 @@ void ABlasterCharacter::Tick(float DeltaTime)
 		}
 		CalculateAO_Pitch();
 	}
+
 	TryToHideACamera();
+	PollInit();
 }
 
 void ABlasterCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -149,6 +152,13 @@ void ABlasterCharacter::PlayElimintationMontage()
 
 void ABlasterCharacter::Eliminate()
 {
+	if (!IsFirstEliminationCall)
+	{
+		return;
+	}
+
+	IsFirstEliminationCall = false;
+
 	MulticastEliminate();
 
 	GetWorldTimerManager().SetTimer(
@@ -587,7 +597,7 @@ void ABlasterCharacter::ReceiveDamage(AActor* DamagedActor, float Damage, const 
 	if (Health == 0.0f && GetWorld())
 	{
 		ABlasterGameMode* BlasterGameMode = GetWorld()->GetAuthGameMode<ABlasterGameMode>();
-		if (BlasterGameMode)
+		if (BlasterGameMode && IsFirstEliminationCall)
 		{
 			BlasterPlayerController = !BlasterPlayerController ? Cast<ABlasterPlayerController>(Controller) : BlasterPlayerController;
 			ABlasterPlayerController* BlasterInstigatorController = Cast<ABlasterPlayerController>(InstigatorController);
@@ -603,6 +613,19 @@ void ABlasterCharacter::UpdateHUDHealth()
 	if (BlasterPlayerController)
 	{
 		BlasterPlayerController->SetHUDHealth(Health, MaxHealth);
+	}
+}
+
+void ABlasterCharacter::PollInit()
+{
+	if (BlasterPlayerState == nullptr)
+	{
+		BlasterPlayerState = GetPlayerState<ABlasterPlayerState>();
+		if (BlasterPlayerState)
+		{
+			BlasterPlayerState->AddToScore(0.0f, true);
+			BlasterPlayerState->AddToDefeats(0);
+		}
 	}
 }
 
@@ -676,6 +699,8 @@ void ABlasterCharacter::EliminateTimerFinished()
 		{
 			ElimBotComponent->DestroyComponent();
 		}
+
+		IsFirstEliminationCall = true;
 	}
 }
 

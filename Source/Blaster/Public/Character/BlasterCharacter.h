@@ -10,6 +10,7 @@
 #include "Components/TimelineComponent.h"
 #include "BlasterCharacter.generated.h"
 
+
 class UWidgetComponent;
 class ABaseWeapon;
 class UCombatComponent;
@@ -18,6 +19,7 @@ class UCameraComponent;
 class ABlasterPlayerController;
 class AController;
 class USoundCue;
+class ABlasterPlayerState;
 
 UCLASS()
 class BLASTER_API ABlasterCharacter : public ACharacter, public IInteractWithCrosshairsInterface
@@ -80,6 +82,9 @@ protected:
 	void ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatorController, AActor* DamageCauser);
 
 	void UpdateHUDHealth();
+
+	//Poll for any relevant classes and initialize our HUD
+	void PollInit();
 	virtual void Jump() override;
 	
 	void FireButtonPressed();
@@ -150,6 +155,11 @@ private:
 	UPROPERTY(EditAnywhere)
 	USoundCue* ElimBotSound;
 
+	bool IsFirstEliminationCall = true;
+
+	UPROPERTY()
+	ABlasterPlayerState* BlasterPlayerState;
+
 	UFUNCTION()
 	void UpdateDissolveMaterial(float DissolveValue);
 	void StartDissolve();
@@ -178,6 +188,7 @@ private:
 
 	FTimerHandle EliminateTimer;
 
+	UPROPERTY()
 	ABlasterPlayerController* BlasterPlayerController;
 
 	UPROPERTY(EditAnywhere)

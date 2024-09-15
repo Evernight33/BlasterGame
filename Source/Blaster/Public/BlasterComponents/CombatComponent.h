@@ -52,8 +52,13 @@ private:
 	UPROPERTY(ReplicatedUsing = OnRep_EquippedWeapon)
 	ABaseWeapon* EquippedWeapon;
 
+	UPROPERTY()
 	ABlasterCharacter* Character;
+
+	UPROPERTY()
 	ABlasterPlayerController* Controller;
+
+	UPROPERTY()
 	ABlasterHUD* HUD;
 
 	UPROPERTY(Replicated)
