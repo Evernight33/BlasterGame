@@ -11,6 +11,7 @@
 #include "Weapon/BulletShell.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "UObject/Object.h"
+#include "Blaster/Public/BlasterPlayerController.h"
 
 ABaseWeapon::ABaseWeapon()
 {
@@ -43,7 +44,22 @@ void ABaseWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifet
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(ABaseWeapon, WeaponState)
+	DOREPLIFETIME(ABaseWeapon, WeaponState);
+	DOREPLIFETIME(ABaseWeapon, Ammo);
+}
+
+void ABaseWeapon::OnRep_Owner()
+{
+	Super::OnRep_Owner();
+	if (!Owner)
+	{
+		BlasterOwnerCharacter = nullptr;
+		BlasterOwnerController = nullptr;
+	}
+	else
+	{
+		SetHUDAmmo();
+	}	
 }
 
 void ABaseWeapon::Fire(const FVector& HitTarget)
@@ -64,6 +80,7 @@ void ABaseWeapon::Fire(const FVector& HitTarget)
 					SocketTransform.GetRotation().Rotator());
 			}
 		}
+		SpendRound();
 	}
 }
 
@@ -73,6 +90,8 @@ void ABaseWeapon::DropWeapon()
 	FDetachmentTransformRules DetachRules(EDetachmentRule::KeepWorld, true);
 	WeaponMesh->DetachFromComponent(DetachRules);
 	SetOwner(nullptr);
+	BlasterOwnerCharacter = nullptr;
+	BlasterOwnerController = nullptr;
 }
 
 void ABaseWeapon::ShowPickupWidget(bool bShowWidget)
@@ -80,6 +99,19 @@ void ABaseWeapon::ShowPickupWidget(bool bShowWidget)
 	if (PickupWidget)
 	{
 		PickupWidget->SetVisibility(bShowWidget);
+	}
+}
+
+void ABaseWeapon::SetHUDAmmo()
+{
+	BlasterOwnerCharacter = !BlasterOwnerCharacter ? Cast<ABlasterCharacter>(GetOwner()) : BlasterOwnerCharacter;
+	if (BlasterOwnerCharacter)
+	{
+		BlasterOwnerController = !BlasterOwnerController ? Cast<ABlasterPlayerController>(BlasterOwnerCharacter->GetController()) : BlasterOwnerController;
+		if (BlasterOwnerController)
+		{
+			BlasterOwnerController->SetHUDWeaponAmmo(Ammo);
+		}
 	}
 }
 
@@ -137,6 +169,17 @@ void ABaseWeapon::OnRep_WeaponState()
 			WeaponMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 			break;
 	}
+}
+
+void ABaseWeapon::OnRep_Ammo()
+{
+	SetHUDAmmo();
+}
+
+void ABaseWeapon::SpendRound()
+{
+	--Ammo;
+	SetHUDAmmo();
 }
 
 void ABaseWeapon::SetWeaponState(EWeaponState State)

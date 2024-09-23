@@ -11,6 +11,8 @@ class USphereComponent;
 class UAnimationAsset;
 class ABulletShell;
 class UTexture2D;
+class ABlasterCharacter;
+class ABlasterPlayerController;
 
 UENUM(BlueprintType)
 enum class EWeaponState : uint8
@@ -31,7 +33,9 @@ public:
 	ABaseWeapon();
 	virtual void Tick(float DeltaTime) override;
 	void ShowPickupWidget(bool bShowWidget);
+	void SetHUDAmmo();
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void OnRep_Owner() override;
 	virtual void Fire(const FVector& HitTarget);
 	void DropWeapon();
 
@@ -114,8 +118,25 @@ private:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<ABulletShell> BulletShell;
 
+	UPROPERTY(EditAnywhere, ReplicatedUsing = OnRep_Ammo)
+	int32 Ammo;
+
+	UPROPERTY(EditAnywhere)
+	int32 MagCapacity;
+
+	UPROPERTY()
+	ABlasterPlayerController* BlasterOwnerController;
+
+	UPROPERTY()
+	ABlasterCharacter* BlasterOwnerCharacter;
+
 	UFUNCTION()
 	void OnRep_WeaponState();
+
+	UFUNCTION()
+	void OnRep_Ammo();
+
+	void SpendRound();
 
 public:
 	void SetWeaponState(EWeaponState State);
