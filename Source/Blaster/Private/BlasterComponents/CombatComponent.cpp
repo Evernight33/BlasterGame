@@ -326,7 +326,7 @@ void UCombatComponent::FireTimerFinished()
 
 void UCombatComponent::Fire()
 {
-	if (bCanfire)
+	if (CanFire())
 	{
 		bCanfire = false;
 		ServerFire(HitTarget);
@@ -337,4 +337,14 @@ void UCombatComponent::Fire()
 			StartFireTimer();
 		}
 	}
+}
+
+bool UCombatComponent::CanFire()
+{
+	if (EquippedWeapon != nullptr)
+	{
+		return !EquippedWeapon->IsEmpty() && bCanfire;
+	}
+
+	return false;
 }

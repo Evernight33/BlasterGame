@@ -178,7 +178,7 @@ void ABaseWeapon::OnRep_Ammo()
 
 void ABaseWeapon::SpendRound()
 {
-	--Ammo;
+	Ammo = FMath::Clamp(Ammo - 1, 0, MagCapacity);
 	SetHUDAmmo();
 }
 
@@ -205,4 +205,9 @@ void ABaseWeapon::SetWeaponState(EWeaponState State)
 			WeaponMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 			break;
 	}
+}
+
+bool ABaseWeapon::IsEmpty()
+{
+	return Ammo <= 0;
 }
