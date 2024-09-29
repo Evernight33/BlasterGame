@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "HUD/BlasterHUD.h"
+#include "Blaster/Public/Weapon/WeaponTypes.h"
 #include "CombatComponent.generated.h"
 
 class ABaseWeapon;
@@ -35,6 +36,9 @@ protected:
 
 	UFUNCTION()
 	void OnRep_EquippedWeapon();
+
+	UFUNCTION()
+	void OnRep_CarryAmmo();
 
 	void FireButtonPressed(bool bPressed);
 
@@ -92,15 +96,20 @@ private:
 	float CurrentFOV;
 	UPROPERTY(EditAnywhere, Category = Combat)
 	float ZoomedFOV = 30.f;
-
 	UPROPERTY(EditAnywhere, Category = Combat)
 	float ZoomInterpSpeed = 20.f;
 
-	void InterpFOV(float DeltaTime);
+	bool bCanfire = true;
+
+	// Carried ammo for the currently equipped weapon
+	UPROPERTY(ReplicatedUsing = OnRep_CarryAmmo)
+	int32 CarryAmmo;
 
 	FTimerHandle FireTimer;
 
-	bool bCanfire = true;
+	TMap<EWeaponType, int32> CarriedAmmoMap;
+
+	void InterpFOV(float DeltaTime);
 
 	void StartFireTimer();
 	void FireTimerFinished();

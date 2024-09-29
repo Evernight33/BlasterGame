@@ -59,6 +59,7 @@ void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 
 	DOREPLIFETIME(UCombatComponent, EquippedWeapon);
 	DOREPLIFETIME(UCombatComponent, bAiming);
+	DOREPLIFETIME_CONDITION(UCombatComponent, CarryAmmo, COND_OwnerOnly);
 }
  
 void UCombatComponent::EquipWeapon(ABaseWeapon* WeaponToEquip)
@@ -125,6 +126,11 @@ void UCombatComponent::OnRep_EquippedWeapon()
 		Character->bUseControllerRotationYaw = true;
 		bCanfire = true;
 	}
+}
+
+void  UCombatComponent::OnRep_CarryAmmo()
+{
+
 }
 
 void UCombatComponent::FireButtonPressed(bool bPressed)
