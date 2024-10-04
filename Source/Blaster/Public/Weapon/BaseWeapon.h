@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "WeaponTypes.h"
 #include "BaseWeapon.generated.h"
 
 class UWidgetComponent;
@@ -124,6 +125,9 @@ private:
 	UPROPERTY(EditAnywhere)
 	int32 MagCapacity;
 
+	UPROPERTY(EditAnywhere)
+	EWeaponType WeaponType;
+
 	UPROPERTY()
 	ABlasterPlayerController* BlasterOwnerController;
 
@@ -144,6 +148,7 @@ public:
 	FORCEINLINE USkeletalMeshComponent* GetWeaponMesh() const { return WeaponMesh; }
 	FORCEINLINE float GetZoomedFOV() const { return ZoomedFOV; }
 	FORCEINLINE float GetZoomInterpSpeed() const { return ZoomInterpSpeed; }
+	FORCEINLINE EWeaponType GetWeaponType() { return WeaponType; }
 
 	bool IsEmpty();
 };

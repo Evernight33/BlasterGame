@@ -42,6 +42,7 @@ public:
 	virtual void Destroyed() override;
 
 	void PlayFireMontage(bool bAiming);
+	void PlayReloadMontage();
 	void SetOverlappingWeapon(ABaseWeapon* Weapon);
 	void PlayElimintationMontage();
 	void Eliminate();
@@ -89,6 +90,8 @@ protected:
 	
 	void FireButtonPressed();
 	void FireButtonReleased();
+
+	void ReloadButtonPressed();
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = Camera)
@@ -205,8 +208,11 @@ private:
 	UAnimMontage* FireWeaponMontage;
 
 	UPROPERTY(EditAnywhere, Category = Combat)
+	UAnimMontage* ReloadMontage;
+
+	UPROPERTY(EditAnywhere, Category = Combat)
 	UAnimMontage* HitReactMontage;
 
 	UPROPERTY(EditAnywhere, Category = Combat)
-	UAnimMontage* EliminationMontage;
+	UAnimMontage* EliminationMontage;	
 };

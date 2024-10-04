@@ -26,6 +26,7 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	void EquipWeapon(ABaseWeapon* WeaponToEquip);
+	void Reload();
 
 protected:
 	virtual void BeginPlay() override;
@@ -51,6 +52,9 @@ protected:
 	void TraceUnderCrosshairs(FHitResult& TraceHitResult);
 
 	void SetHUDCrosshairs(float DeltaTime);
+
+	UFUNCTION(Server, Reliable)
+	void ServerReload();
 
 private:
 	UPROPERTY(ReplicatedUsing = OnRep_EquippedWeapon)
@@ -105,15 +109,18 @@ private:
 	UPROPERTY(ReplicatedUsing = OnRep_CarryAmmo)
 	int32 CarryAmmo;
 
+	UPROPERTY(EditAnywhere)
+	int32 StartingARAmmo = 30;
+
 	FTimerHandle FireTimer;
 
-	TMap<EWeaponType, int32> CarriedAmmoMap;
+	TMap<EWeaponType, int32> CarryAmmoMap;
 
 	void InterpFOV(float DeltaTime);
 
 	void StartFireTimer();
 	void FireTimerFinished();
 	void Fire();
-
 	bool CanFire();
+	void InitializeCarryAmmo();
 };
