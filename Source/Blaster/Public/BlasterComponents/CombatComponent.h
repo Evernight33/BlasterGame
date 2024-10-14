@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "HUD/BlasterHUD.h"
 #include "Blaster/Public/Weapon/WeaponTypes.h"
+#include "Blaster/Public/BlasterTypes/CombatState.h"
 #include "CombatComponent.generated.h"
 
 class ABaseWeapon;
@@ -41,6 +42,9 @@ protected:
 	UFUNCTION()
 	void OnRep_CarryAmmo();
 
+	UFUNCTION()
+	void OnRep_CombatState();
+
 	void FireButtonPressed(bool bPressed);
 
 	UFUNCTION(Server, Reliable)
@@ -55,6 +59,11 @@ protected:
 
 	UFUNCTION(Server, Reliable)
 	void ServerReload();
+
+	UFUNCTION(BlueprintCallable)
+	void FinishReloading();
+
+	void HandleReload();
 
 private:
 	UPROPERTY(ReplicatedUsing = OnRep_EquippedWeapon)
@@ -79,6 +88,9 @@ private:
 	float AimWalkSpeed;
 
 	bool bFireButtonPressed;
+
+	UPROPERTY(ReplicatedUsing = OnRep_CombatState)
+	ECombatState CombatState = ECombatState::ECS_Unoccupied;
 
 	/*
 	* Hud and crosshairs

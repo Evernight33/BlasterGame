@@ -7,6 +7,7 @@
 #include "Engine/SkeletalMeshSocket.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Blaster/Public/Weapon/BaseWeapon.h"
+#include "Blaster/Public/BlasterTypes/CombatState.h"
 
 void UBlasterAnimInstance::NativeInitializeAnimation()
 {
@@ -86,5 +87,7 @@ void UBlasterAnimInstance::NativeUpdateAnimation(float DeltaTime)
 				RightHandRotation = FMath::RInterpTo(RightHandRotation, LookAtRotation, DeltaTime, 30.f);
 			}
 		}
+
+		bUseFabrik = BlasterCharacter->GetCombatState() != ECombatState::ECS_Reloading;
 	}
 }

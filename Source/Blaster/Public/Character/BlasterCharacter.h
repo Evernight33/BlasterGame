@@ -7,6 +7,7 @@
 #include "Blaster/Public/BlasterTypes/TurningInPlace.h"
 #include "Blaster/Public/BlasterTypes/TurningInPlace.h"
 #include "Blaster/Interfaces/Public/InteractWithCrosshairsInterface.h"
+#include "Blaster/Public/BlasterTypes/CombatState.h"
 #include "Components/TimelineComponent.h"
 #include "BlasterCharacter.generated.h"
 
@@ -62,6 +63,8 @@ public:
 	FORCEINLINE float GetMaxHealth() const { return MaxHealth; }
 	FORCEINLINE float GetHealth() const { return Health; }
 
+	ECombatState GetCombatState() const;
+
 	ABaseWeapon* GetEquippedWeapon();
 	FVector GetHitTarget() const;
 
@@ -106,7 +109,7 @@ private:
 	UPROPERTY(ReplicatedUsing = OnRep_OverlappingWeapon)
 	ABaseWeapon* OverlappingWeapon;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UCombatComponent* Combat;
 
 	void CalculateAO_Pitch();

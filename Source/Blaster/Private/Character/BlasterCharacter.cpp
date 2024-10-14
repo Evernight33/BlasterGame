@@ -296,6 +296,16 @@ bool ABlasterCharacter::IsAiming()
 	return (Combat && Combat->bAiming);
 }
 
+ECombatState ABlasterCharacter::GetCombatState() const
+{
+	if (!Combat)
+	{
+		return ECombatState::ECS_MAX;
+	}
+
+	return Combat->CombatState;
+}
+
 ABaseWeapon* ABlasterCharacter::GetEquippedWeapon()
 {
 	if (!Combat)
