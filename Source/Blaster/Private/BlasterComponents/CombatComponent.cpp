@@ -335,7 +335,7 @@ void UCombatComponent::SetHUDCrosshairs(float DeltaTime)
 
 void UCombatComponent::ServerReload_Implementation()
 {
-	if (!Character)
+	if (!Character || !EquippedWeapon)
 	{
 		return;
 	}
@@ -350,6 +350,7 @@ void UCombatComponent::FinishReloading()
 	if (Character != nullptr && Character->HasAuthority())
 	{
 		CombatState = ECombatState::ECS_Unoccupied;
+		UpdateAmmoValues();
 	}
 
 	if (bFireButtonPressed)
@@ -361,6 +362,26 @@ void UCombatComponent::FinishReloading()
 void UCombatComponent::HandleReload()
 {
 	Character->PlayReloadMontage();
+}
+
+int32 UCombatComponent::AmountToReload()
+{
+	if (!EquippedWeapon)
+	{
+		return int32();
+	}
+
+	int32 RoomInMag = EquippedWeapon->GetMagCapacity() - EquippedWeapon->GetAmmo();
+
+	if (CarryAmmoMap.Contains(EquippedWeapon->GetWeaponType()))
+	{
+		int32 AmountCarried = CarryAmmoMap[EquippedWeapon->GetWeaponType()];
+		int32 Least = FMath::Min(RoomInMag, AmountCarried);
+
+		return FMath::Clamp(RoomInMag, 0, Least);
+	}
+
+	return int32();
 }
 
 void UCombatComponent::InterpFOV(float DeltaTime)
@@ -433,4 +454,27 @@ bool UCombatComponent::CanFire()
 void UCombatComponent::InitializeCarryAmmo()
 {
 	CarryAmmoMap.Emplace(EWeaponType::EWT_AssaultRifle, StartingARAmmo);
+}
+
+void UCombatComponent::UpdateAmmoValues()
+{
+	if (!Character || !EquippedWeapon)
+	{
+		return;
+	}
+
+	int32 ReloadAmount = AmountToReload();
+	if (CarryAmmoMap.Contains(EquippedWeapon->GetWeaponType()))
+	{
+		CarryAmmoMap[EquippedWeapon->GetWeaponType()] -= ReloadAmount;
+		CarryAmmo = CarryAmmoMap[EquippedWeapon->GetWeaponType()];
+	}
+
+	Controller = !Controller ? Cast<ABlasterPlayerController>(Character->Controller) : Controller;
+	if (Controller)
+	{
+		Controller->SetHUDCarriedAmmo(CarryAmmo);
+	}
+
+	EquippedWeapon->AddAmmo(-ReloadAmount);
 }

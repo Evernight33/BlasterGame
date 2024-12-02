@@ -65,6 +65,8 @@ protected:
 
 	void HandleReload();
 
+	int32 AmountToReload();
+
 private:
 	UPROPERTY(ReplicatedUsing = OnRep_EquippedWeapon)
 	ABaseWeapon* EquippedWeapon;
@@ -135,4 +137,5 @@ private:
 	void Fire();
 	bool CanFire();
 	void InitializeCarryAmmo();
+	void UpdateAmmoValues();
 };

@@ -94,6 +94,12 @@ void ABaseWeapon::DropWeapon()
 	BlasterOwnerController = nullptr;
 }
 
+void ABaseWeapon::AddAmmo(int32 AmmoToAdd)
+{
+	Ammo = FMath::Clamp(Ammo - AmmoToAdd, 0, MagCapacity);
+	SetHUDAmmo();
+}
+
 void ABaseWeapon::ShowPickupWidget(bool bShowWidget)
 {
 	if (PickupWidget)
