@@ -13,7 +13,7 @@
 #include "BlasterPlayerController.h"
 #include "Camera/CameraComponent.h"
 #include "TimerManager.h"
-
+#include "Sound/SoundCue.h"
 UCombatComponent::UCombatComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
@@ -100,6 +100,15 @@ void UCombatComponent::EquipWeapon(ABaseWeapon* WeaponToEquip)
 			Controller->SetHUDCarriedAmmo(CarryAmmo);
 		}
 
+		if (EquippedWeapon->EquipSound)
+		{
+			UGameplayStatics::PlaySoundAtLocation(
+				this,
+				EquippedWeapon->EquipSound,
+				Character->GetActorLocation()
+			);
+		}
+
 		Character->GetCharacterMovement()->bOrientRotationToMovement = false;
 		Character->bUseControllerRotationYaw = true;
 		bCanfire = true;
@@ -147,6 +156,12 @@ void UCombatComponent::OnRep_EquippedWeapon()
 		{
 			HandSocket->AttachActor(EquippedWeapon, Character->GetMesh());
 		}
+
+		UGameplayStatics::PlaySoundAtLocation(
+			this,
+			EquippedWeapon->EquipSound,
+			Character->GetActorLocation()
+		);
 
 		Character->GetCharacterMovement()->bOrientRotationToMovement = false;
 		Character->bUseControllerRotationYaw = true;

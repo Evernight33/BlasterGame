@@ -14,6 +14,7 @@ class ABulletShell;
 class UTexture2D;
 class ABlasterCharacter;
 class ABlasterPlayerController;
+class USoundCue;
 
 UENUM(BlueprintType)
 enum class EWeaponState : uint8
@@ -69,6 +70,9 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = Combat)
 	bool bAutomatic = true;
+
+	UPROPERTY(EditAnywhere)
+	USoundCue* EquipSound;
 
 	/*
 	* Zoomed FOV
