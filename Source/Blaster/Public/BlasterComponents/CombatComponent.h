@@ -7,6 +7,7 @@
 #include "HUD/BlasterHUD.h"
 #include "Blaster/Public/Weapon/WeaponTypes.h"
 #include "Blaster/Public/BlasterTypes/CombatState.h"
+#include "Components/TimelineComponent.h"
 #include "CombatComponent.generated.h"
 
 class ABaseWeapon;
@@ -89,10 +90,15 @@ private:
 	UPROPERTY(EditAnywhere)
 	float AimWalkSpeed;
 
-	bool bFireButtonPressed;
+	UPROPERTY(EditDefaultsOnly)
+	float TextDelay = 0.05f;
 
 	UPROPERTY(ReplicatedUsing = OnRep_CombatState)
 	ECombatState CombatState = ECombatState::ECS_Unoccupied;
+
+	bool bFireButtonPressed;
+
+	FTimerHandle EquipTimer;
 
 	/*
 	* Hud and crosshairs
@@ -138,4 +144,5 @@ private:
 	bool CanFire();
 	void InitializeCarryAmmo();
 	void UpdateAmmoValues();
+	void SetHudText();
 };

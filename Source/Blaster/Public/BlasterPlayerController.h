@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "Blaster/Public/Weapon/WeaponTypes.h"
 #include "BlasterPlayerController.generated.h"
 
 class ABlasterHUD;
@@ -19,7 +20,8 @@ public:
 	void SetHUDWeaponAmmo(int32 Ammo);
 	void SetHUDCarriedAmmo(int32 Ammo);
 	void SetElimTextVisibility(bool IsVisible);
-
+	void SetTextWeaponType(EWeaponType WeaponType);
+	void SetTextWeaponTypeInvisible();
 	virtual void OnPossess(APawn* InPawn) override;
 
 protected:

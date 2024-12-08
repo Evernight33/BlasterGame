@@ -34,4 +34,7 @@ public:
 
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* CarryAmmoAmount;
+
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* WeaponType;
 };

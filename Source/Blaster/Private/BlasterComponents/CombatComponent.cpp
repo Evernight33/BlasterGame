@@ -14,6 +14,8 @@
 #include "Camera/CameraComponent.h"
 #include "TimerManager.h"
 #include "Sound/SoundCue.h"
+#include "TimerManager.h"
+
 UCombatComponent::UCombatComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
@@ -95,9 +97,10 @@ void UCombatComponent::EquipWeapon(ABaseWeapon* WeaponToEquip)
 		}
 
 		Controller = !Controller ? Cast<ABlasterPlayerController>(Character->GetController()) : Controller;
-		if (Controller)
+		if (Controller && EquippedWeapon)
 		{
 			Controller->SetHUDCarriedAmmo(CarryAmmo);
+			Controller->SetTextWeaponType(EquippedWeapon->GetWeaponType());
 		}
 
 		if (EquippedWeapon->EquipSound)
@@ -112,6 +115,11 @@ void UCombatComponent::EquipWeapon(ABaseWeapon* WeaponToEquip)
 		Character->GetCharacterMovement()->bOrientRotationToMovement = false;
 		Character->bUseControllerRotationYaw = true;
 		bCanfire = true;
+
+		if (EquippedWeapon->IsEmpty())
+		{
+			Reload();
+		}
 	}
 }
 
@@ -148,7 +156,7 @@ void UCombatComponent::OnRep_EquippedWeapon()
 {
 	if (EquippedWeapon && Character)
 	{
-		EquippedWeapon->SetWeaponState(EWeaponState::EWS_Equipped);
+		EquippedWeapon->SetWeaponState(EWeaponState::EWS_Equipped);		
 
 		const USkeletalMeshSocket* HandSocket = Character->GetMesh()->GetSocketByName(FName("RightHandSocket"));
 
@@ -166,6 +174,12 @@ void UCombatComponent::OnRep_EquippedWeapon()
 		Character->GetCharacterMovement()->bOrientRotationToMovement = false;
 		Character->bUseControllerRotationYaw = true;
 		bCanfire = true;
+
+		Character->GetWorldTimerManager().SetTimer(
+			EquipTimer,
+			this,
+			&UCombatComponent::SetHudText,
+			TextDelay);
 	}
 }
 
@@ -439,6 +453,11 @@ void UCombatComponent::FireTimerFinished()
 	{
 		Fire();
 	}
+
+	if (EquippedWeapon->IsEmpty())
+	{
+		Reload();
+	}
 }
 
 void UCombatComponent::Fire()
@@ -492,4 +511,13 @@ void UCombatComponent::UpdateAmmoValues()
 	}
 
 	EquippedWeapon->AddAmmo(-ReloadAmount);
+}
+
+void UCombatComponent::SetHudText()
+{
+	Controller = !Controller ? Cast<ABlasterPlayerController>(Character->GetController()) : Controller;
+	if (Controller && EquippedWeapon)
+	{
+		Controller->SetTextWeaponType(EquippedWeapon->GetWeaponType());
+	}
 }

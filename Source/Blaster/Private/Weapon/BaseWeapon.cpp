@@ -88,6 +88,12 @@ void ABaseWeapon::DropWeapon()
 {
 	SetWeaponState(EWeaponState::EWS_Dropped);
 	FDetachmentTransformRules DetachRules(EDetachmentRule::KeepWorld, true);
+
+	if (BlasterOwnerController)
+	{
+		BlasterOwnerController->SetTextWeaponTypeInvisible();
+	}		
+
 	WeaponMesh->DetachFromComponent(DetachRules);
 	SetOwner(nullptr);
 	BlasterOwnerCharacter = nullptr;
@@ -157,7 +163,6 @@ void ABaseWeapon::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, A
 	}
 }
 
-
 void ABaseWeapon::OnRep_WeaponState()
 {
 	switch (WeaponState)
@@ -169,6 +174,7 @@ void ABaseWeapon::OnRep_WeaponState()
 			WeaponMesh->SetEnableGravity(false);
 			WeaponMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 			break;
+
 		case EWeaponState::EWS_Dropped:
 			WeaponMesh->SetSimulatePhysics(true);
 			WeaponMesh->SetEnableGravity(true);
@@ -201,11 +207,13 @@ void ABaseWeapon::SetWeaponState(EWeaponState State)
 			WeaponMesh->SetEnableGravity(false);
 			WeaponMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 			break;
+
 		case EWeaponState::EWS_Dropped:
 			if (HasAuthority())
 			{
 				AreaSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 			}
+
 			WeaponMesh->SetSimulatePhysics(true);
 			WeaponMesh->SetEnableGravity(true);
 			WeaponMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);

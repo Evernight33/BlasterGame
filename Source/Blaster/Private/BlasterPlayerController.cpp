@@ -8,6 +8,7 @@
 #include "Components/TextBlock.h"
 #include "Blaster/Public/Character/BlasterCharacter.h"
 
+
 void ABlasterPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
@@ -102,5 +103,29 @@ void ABlasterPlayerController::OnPossess(APawn* InPawn)
 	if (BlasterCharacter)
 	{
 		SetHUDHealth(BlasterCharacter->GetHealth(), BlasterCharacter->GetMaxHealth());
+	}
+}
+
+void ABlasterPlayerController::SetTextWeaponType(EWeaponType WeaponType)
+{
+	BlasterHUD = !BlasterHUD ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
+	if (BlasterHUD && BlasterHUD->CharacterOverlay)
+	{
+		switch (WeaponType)
+		{
+		case EWeaponType::EWT_AssaultRifle:
+			BlasterHUD->CharacterOverlay->WeaponType->SetText(FText::FromString("Rifle"));
+			BlasterHUD->CharacterOverlay->WeaponType->SetVisibility(ESlateVisibility::Visible);
+			break;
+		}		
+	}
+}
+
+void ABlasterPlayerController::SetTextWeaponTypeInvisible()
+{
+	BlasterHUD = !BlasterHUD ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
+	if (BlasterHUD && BlasterHUD->CharacterOverlay)
+	{
+		BlasterHUD->CharacterOverlay->WeaponType->SetVisibility(ESlateVisibility::Collapsed);
 	}
 }
