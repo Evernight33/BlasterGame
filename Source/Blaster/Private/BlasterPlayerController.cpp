@@ -16,6 +16,13 @@ void ABlasterPlayerController::BeginPlay()
 	BlasterHUD = Cast<ABlasterHUD>(GetHUD());
 }
 
+void ABlasterPlayerController::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	SetHUDTime();
+}
+
 void ABlasterPlayerController::SetHUDHealth(float CurrentHealth, float MaxHealth)
 {
 	BlasterHUD = !BlasterHUD ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
@@ -128,4 +135,35 @@ void ABlasterPlayerController::SetTextWeaponTypeInvisible()
 	{
 		BlasterHUD->CharacterOverlay->WeaponType->SetVisibility(ESlateVisibility::Collapsed);
 	}
+}
+
+void ABlasterPlayerController::SetHUDMatchCountdown(float CountdownTime)
+{
+	BlasterHUD = !BlasterHUD ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
+
+	if (BlasterHUD && BlasterHUD->CharacterOverlay
+		&& BlasterHUD->CharacterOverlay->MatchCountDownText)
+	{
+		int32 Mins = FMath::FloorToInt(CountdownTime / 60.0f);
+		int32 Secs = FMath::FloorToInt(CountdownTime) % 60;
+
+		FString CountdownText = FString::Printf(TEXT("%02d:%02d"), Mins, Secs);
+		BlasterHUD->CharacterOverlay->MatchCountDownText->SetText(FText::FromString(CountdownText));
+	}
+}
+
+void ABlasterPlayerController::SetHUDTime()
+{
+	if (!GetWorld())
+	{
+		return;
+	}
+
+	uint32 SecondsLeft = FMath::CeilToInt(MatchTime - GetWorld()->GetTimeSeconds());
+	if (CountdownInt != SecondsLeft)
+	{
+		SetHUDMatchCountdown(MatchTime - GetWorld()->GetTimeSeconds());
+	}
+
+	CountdownInt = SecondsLeft;
 }

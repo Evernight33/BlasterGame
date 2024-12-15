@@ -22,12 +22,20 @@ public:
 	void SetElimTextVisibility(bool IsVisible);
 	void SetTextWeaponType(EWeaponType WeaponType);
 	void SetTextWeaponTypeInvisible();
+	void SetHUDMatchCountdown(float CountdownTime);
+
 	virtual void OnPossess(APawn* InPawn) override;
+	virtual void Tick(float DeltaTime) override;
 
 protected:
 	virtual void BeginPlay() override;
 
+	void SetHUDTime();
+
 private:
 	UPROPERTY()
 	ABlasterHUD* BlasterHUD;
+
+	float MatchTime = 120.0f;
+	uint32 CountdownInt = 0;
 };
