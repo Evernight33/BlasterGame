@@ -8,6 +8,7 @@
 #include "BlasterPlayerController.generated.h"
 
 class ABlasterHUD;
+class UCharacterOverlay;
 
 UCLASS()
 class BLASTER_API ABlasterPlayerController : public APlayerController
@@ -23,9 +24,11 @@ public:
 	void SetTextWeaponType(EWeaponType WeaponType);
 	void SetTextWeaponTypeInvisible();
 	void SetHUDMatchCountdown(float CountdownTime);
+	void OnMatchStateSet(FName State);
 
 	virtual void OnPossess(APawn* InPawn) override;
 	virtual void Tick(float DeltaTime) override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void ReceivedPlayer() override; // Syync with server clock as soon as possible
 	virtual float GetServerTime(); // Sync with Server world clock
 
@@ -33,7 +36,7 @@ protected:
 	virtual void BeginPlay() override;
 
 	void SetHUDTime();
-
+	void PollInit();
 	/**
 	 * Sync time between client and server
 	 */
@@ -61,4 +64,13 @@ private:
 
 	float MatchTime = 120.0f;
 	uint32 CountdownInt = 0;
+
+	UPROPERTY(ReplicatedUsing = OnRep_MatchState)
+	FName MatchState;
+
+	UPROPERTY()
+	UCharacterOverlay* CharacterOverlay;
+
+	UFUNCTION()
+	void OnRep_MatchState();
 };
