@@ -4,6 +4,7 @@
 #include "BlasterPlayerController.h"
 #include "HUD/BlasterHUD.h"
 #include "HUD/CharacterOverlay.h"
+#include "HUD/Announcement.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
 #include "Blaster/Public/Character/BlasterCharacter.h"
@@ -12,10 +13,14 @@
 #include "Blaster/Public/PlayerState/BlasterPlayerState.h"
 
 void ABlasterPlayerController::BeginPlay()
-{
+{ 
 	Super::BeginPlay();
 
 	BlasterHUD = Cast<ABlasterHUD>(GetHUD());
+	if (BlasterHUD)
+	{
+		BlasterHUD->AddAnnouncement();
+	}
 }
 
 void ABlasterPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -186,12 +191,21 @@ void ABlasterPlayerController::OnMatchStateSet(FName State)
 {
 	MatchState = State;
 
+	HandleMatchHasStarted();
+}
+
+void ABlasterPlayerController::HandleMatchHasStarted()
+{
 	if (MatchState == MatchState::InProgress)
 	{
 		BlasterHUD = !BlasterHUD ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
 		if (BlasterHUD)
 		{
 			BlasterHUD->AddCharacterOverlay();
+			if (BlasterHUD->Announcement)
+			{
+				BlasterHUD->Announcement->SetVisibility(ESlateVisibility::Hidden);
+			}
 		}
 	}
 }
@@ -237,12 +251,5 @@ float ABlasterPlayerController::GetServerTime()
 
 void ABlasterPlayerController::OnRep_MatchState()
 {
-	if (MatchState == MatchState::InProgress)
-	{
-		BlasterHUD = !BlasterHUD ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
-		if (BlasterHUD)
-		{
-			BlasterHUD->AddCharacterOverlay();
-		}
-	}
+	HandleMatchHasStarted();
 }

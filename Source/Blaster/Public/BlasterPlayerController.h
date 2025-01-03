@@ -25,6 +25,7 @@ public:
 	void SetTextWeaponTypeInvisible();
 	void SetHUDMatchCountdown(float CountdownTime);
 	void OnMatchStateSet(FName State);
+	void HandleMatchHasStarted();
 
 	virtual void OnPossess(APawn* InPawn) override;
 	virtual void Tick(float DeltaTime) override;
