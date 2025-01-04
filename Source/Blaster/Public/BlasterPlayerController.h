@@ -19,6 +19,7 @@ public:
 	void SetHUDScore(float Score);
 	void SetHUDDefeats(int32 Defeats);
 	void SetHUDWeaponAmmo(int32 Ammo);
+	void SetHUDAnnouncementCountDown(float CountdownTime);
 	void SetHUDCarriedAmmo(int32 Ammo);
 	void SetElimTextVisibility(bool IsVisible);
 	void SetTextWeaponType(EWeaponType WeaponType);
@@ -46,11 +47,17 @@ protected:
 	UFUNCTION(Server, Reliable)
 	void ServerRequestServerTime(float TimeOfClientRequest);
 
+	UFUNCTION(Server, Reliable)
+	void ServerCheckMatchState();
+
 	// Reports the current server time to the client in response to ServerRequestServerTime
 	UFUNCTION(Client, Reliable)
 	void ClientReportServerTime(float TimeOfClientRequest, float TimeServerReceivedClientRequest);
 
-	void CheckTimeSync(float DeltaTime);
+	UFUNCTION(Client, Reliable)
+	void ClientJoinMidGame(FName StateOfMatch, float Warmup, float LevelStarting, float Match);
+
+	void CheckTimeSync(float DeltaTime);	
 
 	float ClientServerDelta = 0.0f; // Difference between client and server time
 
@@ -62,8 +69,10 @@ protected:
 private:
 	UPROPERTY()
 	ABlasterHUD* BlasterHUD;
-
-	float MatchTime = 120.0f;
+	
+	float LevelStartingTime = 0.0f;
+	float MatchTime = 0.0f;
+	float WarmupTime = 0.0f;
 	uint32 CountdownInt = 0;
 
 	UPROPERTY(ReplicatedUsing = OnRep_MatchState)
