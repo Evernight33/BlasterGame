@@ -27,6 +27,7 @@ public:
 	void SetHUDMatchCountdown(float CountdownTime);
 	void OnMatchStateSet(FName State);
 	void HandleMatchHasStarted();
+	void HandleCooldown();
 
 	virtual void OnPossess(APawn* InPawn) override;
 	virtual void Tick(float DeltaTime) override;

@@ -202,7 +202,14 @@ void ABlasterPlayerController::OnMatchStateSet(FName State)
 {
 	MatchState = State;
 
-	HandleMatchHasStarted();
+	if (MatchState == MatchState::InProgress)
+	{
+		HandleMatchHasStarted();
+	}
+	else if (MatchState == MatchState::Cooldown)
+	{
+		HandleCooldown();
+	}
 }
 
 void ABlasterPlayerController::HandleMatchHasStarted()
@@ -216,6 +223,22 @@ void ABlasterPlayerController::HandleMatchHasStarted()
 			if (BlasterHUD->Announcement)
 			{
 				BlasterHUD->Announcement->SetVisibility(ESlateVisibility::Hidden);
+			}
+		}
+	}
+}
+
+void ABlasterPlayerController::HandleCooldown()
+{
+	if (MatchState == MatchState::Cooldown)
+	{
+		BlasterHUD = !BlasterHUD ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
+		if (BlasterHUD && BlasterHUD->CharacterOverlay)
+		{
+			BlasterHUD->CharacterOverlay->RemoveFromParent();
+			if (BlasterHUD->Announcement)
+			{
+				BlasterHUD->Announcement->SetVisibility(ESlateVisibility::Visible);
 			}
 		}
 	}
@@ -279,12 +302,6 @@ void ABlasterPlayerController::ServerCheckMatchState_Implementation()
 		LevelStartingTime = GameMode->LevelStartingTime;
 		MatchState = GameMode->GetMatchState();
 		ClientJoinMidGame(MatchState, WarmupTime, LevelStartingTime, MatchTime);
-
-		BlasterHUD = Cast<ABlasterHUD>(GetHUD());
-		if (BlasterHUD && MatchState == MatchState::WaitingToStart)
-		{
-			BlasterHUD->AddAnnouncement();
-		}
 	}
 }
 
@@ -322,5 +339,12 @@ float ABlasterPlayerController::GetServerTime()
 
 void ABlasterPlayerController::OnRep_MatchState()
 {
-	HandleMatchHasStarted();
+	if (MatchState == MatchState::InProgress)
+	{
+		HandleMatchHasStarted();
+	}
+	else if (MatchState == MatchState::Cooldown)
+	{
+		HandleCooldown();
+	}
 }
