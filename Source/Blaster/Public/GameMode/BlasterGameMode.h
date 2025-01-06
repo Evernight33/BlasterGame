@@ -37,6 +37,8 @@ public:
 
 	float LevelStartingTime = 0.0f;
 
+	FORCEINLINE float GetCountdownTime() { return CountDownTime; }
+
 private:
 	float CountDownTime = 0.0f;
 
