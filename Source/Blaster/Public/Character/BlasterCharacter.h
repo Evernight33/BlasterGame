@@ -62,11 +62,16 @@ public:
 	FORCEINLINE bool IsEliminated() const { return bEliminated; }
 	FORCEINLINE float GetMaxHealth() const { return MaxHealth; }
 	FORCEINLINE float GetHealth() const { return Health; }
+	FORCEINLINE UCombatComponent* GetCombat() const { return Combat; }
+	FORCEINLINE bool GetDisableGameplay() const { return bDisableGameplay; }
 
 	ECombatState GetCombatState() const;
 
 	ABaseWeapon* GetEquippedWeapon();
 	FVector GetHitTarget() const;
+
+	UPROPERTY(Replicated)
+	bool bDisableGameplay = false;
 
 protected:
 	virtual void BeginPlay() override;
@@ -89,6 +94,9 @@ protected:
 
 	//Poll for any relevant classes and initialize our HUD
 	void PollInit();
+
+	void RotateInPlace(float DeltaTime);
+
 	virtual void Jump() override;
 	
 	void FireButtonPressed();
