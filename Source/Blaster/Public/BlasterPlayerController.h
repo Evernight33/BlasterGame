@@ -77,6 +77,9 @@ private:
 	float WarmupTime = 0.0f;
 	float CooldownTime = 0.0f;
 	uint32 CountdownInt = 0;
+	bool bIsTimerSet = false;
+
+	FTimerHandle BlinkingTimer;
 
 	UPROPERTY(ReplicatedUsing = OnRep_MatchState)
 	FName MatchState;
@@ -89,4 +92,6 @@ private:
 
 	UFUNCTION()
 	void OnRep_MatchState();
+
+	void TextBlinking();
 };

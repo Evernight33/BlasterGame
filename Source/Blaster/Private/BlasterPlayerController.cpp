@@ -14,6 +14,7 @@
 #include <Kismet/GameplayStatics.h>
 #include "Blaster/Public/BlasterComponents/CombatComponent.h"
 #include "Blaster/Public/GameState/BlasterGameState.h"
+#include "TimerManager.h"
 
 void ABlasterPlayerController::BeginPlay()
 { 
@@ -210,6 +211,14 @@ void ABlasterPlayerController::SetHUDMatchCountdown(float CountdownTime)
 			int32 Secs = FMath::FloorToInt(CountdownTime) % 60;
 
 			FString CountdownText = FString::Printf(TEXT("%02d:%02d"), Mins, Secs);
+
+			if (Mins == 0 && Secs <= 30 && bIsTimerSet == false)
+			{
+				bIsTimerSet = true;
+				GetWorldTimerManager().SetTimer(BlinkingTimer, this, &ABlasterPlayerController::TextBlinking, 0.5f, true);
+				BlasterHUD->CharacterOverlay->MatchCountDownText->SetColorAndOpacity(FLinearColor(255, 0, 0, 0.5));
+			}
+
 			BlasterHUD->CharacterOverlay->MatchCountDownText->SetText(FText::FromString(CountdownText));
 		}		
 	}
@@ -260,6 +269,10 @@ void ABlasterPlayerController::HandleCooldown()
 				BlasterHUD->Announcement->SetVisibility(ESlateVisibility::Visible);
 				FString AnnouncementText("New Match Starts In:");
 				BlasterHUD->Announcement->AnnouncementText->SetText(FText::FromString(AnnouncementText));
+
+				BlasterHUD->CharacterOverlay->MatchCountDownText->SetColorAndOpacity(FLinearColor(0, 0, 0, 0));
+				bIsTimerSet = false;
+				GetWorldTimerManager().ClearTimer(BlinkingTimer);
 
 				ABlasterGameState* BlasterGameState = Cast<ABlasterGameState>(UGameplayStatics::GetGameState(this));
 				ABlasterPlayerState* BlasterPlayerState = Cast<ABlasterPlayerState>(this->PlayerState);
@@ -420,4 +433,19 @@ void ABlasterPlayerController::OnRep_MatchState()
 	{
 		HandleCooldown();
 	}
+}
+
+void ABlasterPlayerController::TextBlinking()
+{
+	static int Counter = 0;
+	if (Counter % 2 == 0)
+	{
+		BlasterHUD->CharacterOverlay->MatchCountDownText->SetVisibility(ESlateVisibility::Hidden);
+	}
+	else
+	{
+		BlasterHUD->CharacterOverlay->MatchCountDownText->SetVisibility(ESlateVisibility::Visible);
+	}
+
+	Counter += 1;
 }
