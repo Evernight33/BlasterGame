@@ -488,6 +488,7 @@ bool UCombatComponent::CanFire()
 void UCombatComponent::InitializeCarryAmmo()
 {
 	CarryAmmoMap.Emplace(EWeaponType::EWT_AssaultRifle, StartingARAmmo);
+	CarryAmmoMap.Emplace(EWeaponType::EWT_RocketLauncher, StartingRocketAmmo);
 }
 
 void UCombatComponent::UpdateAmmoValues()
