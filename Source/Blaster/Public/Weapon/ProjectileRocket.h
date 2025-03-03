@@ -6,6 +6,8 @@
 #include "Weapon/Projectile.h"
 #include "ProjectileRocket.generated.h"
 
+class URocketMovementComponent;
+
 /**
  * 
  */
@@ -16,11 +18,13 @@ class BLASTER_API AProjectileRocket : public AProjectile
 public:
 	AProjectileRocket();
 
+	UPROPERTY(VisibleAnywhere)
+	URocketMovementComponent* RocketMovementComponent;
+
 protected:
 	virtual void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit) override;
 
 private:
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* RocketMesh;
-
 };
