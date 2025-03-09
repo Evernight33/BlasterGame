@@ -77,7 +77,7 @@ void AProjectile::Destroyed()
 {
 	Super::Destroy();
 
-	if (ImpactParticles && GetWorld() && !Cast<AProjectileRocket>(this))
+	if (ImpactParticles && GetWorld())
 	{
 		if (bImpactCharacter)
 		{

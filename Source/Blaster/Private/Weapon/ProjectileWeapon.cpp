@@ -24,7 +24,6 @@ void AProjectileWeapon::Fire(const FVector& HitTarget)
 				FTransform SocketTransform = MuzzleFlashSocket->GetSocketTransform(WeaponMeshSuper);
 
 				FVector ProjectileSpawnLocation = SocketTransform.GetLocation();
-				ProjectileSpawnLocation.Z += 100;
 
 				// Vector from weapon muzzle to hit location
 				FVector ToTarget = HitTarget - ProjectileSpawnLocation;
