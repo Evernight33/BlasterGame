@@ -227,6 +227,11 @@ void ABlasterCharacter::MulticastEliminate_Implementation()
 			GetActorLocation()
 		);
 	}
+
+	if (IsLocallyControlled() && IsAiming() && Combat->EquippedWeapon && Combat->EquippedWeapon->GetWeaponType() == EWeaponType::EWT_SniperRifle)
+	{
+		ShowSniperScopeWidget(false);
+	}
 }
 
 void ABlasterCharacter::TurnInPlace(float DeltaTime)
