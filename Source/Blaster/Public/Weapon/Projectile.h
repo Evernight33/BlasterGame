@@ -11,6 +11,8 @@ class UProjectileMovementComponent;
 class UParticleSystem;
 class UParticleSystemComponent;
 class USoundCue;
+class UNiagaraSystem;
+class UNiagaraComponent;
 
 UCLASS()
 class BLASTER_API AProjectile : public AActor
@@ -23,9 +25,14 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	void StartDestroyTimer();
+	void DestroyTimerFinished();
+	void SpawnTrailSystem();
+	void ExplodeDamage();
+
 	UFUNCTION()
 	virtual void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
-
+	
 	UPROPERTY(EditAnywhere)
 	float Damage = 20.f;
 
@@ -40,6 +47,21 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	UBoxComponent* CollisionBox;
+
+	UPROPERTY(EditAnywhere)
+	UNiagaraSystem* TrailSystem;
+
+	UPROPERTY()
+	UNiagaraComponent* TrailSystemComponent;
+
+	UPROPERTY(VisibleAnywhere)
+	UStaticMeshComponent* ProjectileMesh;
+
+	UPROPERTY(EditAnywhere)
+	float DamageInnerRadius = 200.0;
+
+	UPROPERTY(EditAnywhere)
+	float DamageOuterRadius = 200.0;
 
 private:
 	UPROPERTY(EditAnywhere)
@@ -56,6 +78,11 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	USoundCue* ImpactCharacterSound;
+
+	UPROPERTY(EditAnywhere)
+	float DestroyTime = 3.0f;
+
+	FTimerHandle DestroyTimer;
 
 	bool bImpactCharacter = false;
 	bool bImpactStone = false;
