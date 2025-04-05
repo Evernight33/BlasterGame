@@ -392,7 +392,7 @@ void ABlasterCharacter::PlayFireMontage(bool bAiming)
 		}
 	}
 }
-PRAGMA_DISABLE_OPTIMIZATION
+
 void  ABlasterCharacter::PlayReloadMontage()
 {
 	if (!Combat || !Combat->EquippedWeapon)
@@ -404,8 +404,15 @@ void  ABlasterCharacter::PlayReloadMontage()
 	{
 		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 
-		if (AnimInstance && ReloadMontage)
+		if (AnimInstance && ReloadMontage && ReloadSniperRifleMontage)
 		{
+			if (Combat->EquippedWeapon->GetWeaponType() == EWeaponType::EWT_SniperRifle)
+			{
+				AnimInstance->Montage_Play(ReloadSniperRifleMontage);
+				AnimInstance->Montage_JumpToSection(FName("SniperRifle"));
+				return;
+			}
+
 			AnimInstance->Montage_Play(ReloadMontage);
 			FName SectionName;
 
@@ -425,9 +432,6 @@ void  ABlasterCharacter::PlayReloadMontage()
 				break;
 			case EWeaponType::EWT_Shotgun:
 				SectionName = FName("Shotgun");
-				break;
-			case EWeaponType::EWT_SniperRifle:
-				SectionName = FName("SniperRifle");
 				break;
 			case EWeaponType::EWT_GrenadeLauncher:
 				SectionName = FName("Rifle");
