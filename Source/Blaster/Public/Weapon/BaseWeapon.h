@@ -41,6 +41,7 @@ public:
 	virtual void Fire(const FVector& HitTarget);
 	void DropWeapon();
 	void AddAmmo(int32 AmmoToAdd);
+	void EnableCustomDepth(bool bEnable);
 
 	/*
 	* Textures for the weapon crosshairs

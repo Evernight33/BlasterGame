@@ -16,7 +16,7 @@
 #include "TimerManager.h"
 #include "Sound/SoundCue.h"
 #include "TimerManager.h"
-PRAGMA_DISABLE_OPTIMIZATION
+
 UCombatComponent::UCombatComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
@@ -597,4 +597,3 @@ void UCombatComponent::SetHudText()
 		Controller->SetTextWeaponType(EquippedWeapon->GetWeaponType());
 	}
 }
-PRAGMA_ENABLE_OPTIMIZATION
