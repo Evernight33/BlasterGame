@@ -139,6 +139,15 @@ void ABlasterCharacter::PlayElimintationMontage()
 	}
 }
 
+void ABlasterCharacter::PlayThrowGrenadeMontage()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && ThrowGrenadeMontage)
+	{
+		AnimInstance->Montage_Play(ThrowGrenadeMontage);
+	}
+}
+
 void ABlasterCharacter::Eliminate()
 {
 	if (!IsFirstEliminationCall)
@@ -334,6 +343,7 @@ void ABlasterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	PlayerInputComponent->BindAction("Fire", IE_Released, this, &ABlasterCharacter::FireButtonReleased);
 
 	PlayerInputComponent->BindAction("Reload", IE_Pressed, this, &ABlasterCharacter::ReloadButtonPressed);
+	PlayerInputComponent->BindAction("ThrowGrenade", IE_Pressed, this, &ABlasterCharacter::GrenadeButtonPressed);
 }
 
 void ABlasterCharacter::PostInitializeComponents()
@@ -474,6 +484,15 @@ void ABlasterCharacter::BeginPlay()
 	if (HasAuthority())
 	{
 		OnTakeAnyDamage.AddDynamic(this, &ABlasterCharacter::ReceiveDamage);
+	}
+
+	if (HasAuthority())
+	{
+		UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+		if (AnimInstance)
+		{
+			AnimInstance->OnMontageEnded.AddDynamic(this, &ABlasterCharacter::OnMontageEnded);
+		}
 	}
 }
 
@@ -774,6 +793,14 @@ void ABlasterCharacter::ReloadButtonPressed()
 	}
 }
 
+void ABlasterCharacter::GrenadeButtonPressed()
+{
+	if (Combat)
+	{
+		Combat->ThrowGrenade();
+	}
+}
+
 void ABlasterCharacter::OnRep_Health()
 {
 	UpdateHUDHealth();
@@ -818,6 +845,14 @@ void ABlasterCharacter::EliminateTimerFinished()
 		}
 
 		IsFirstEliminationCall = true;
+	}
+}
+
+void ABlasterCharacter::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
+{
+	if (Montage == ThrowGrenadeMontage && Combat)
+	{
+		Combat->ThrowGrenadeFinished();
 	}
 }
 

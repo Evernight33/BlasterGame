@@ -30,6 +30,7 @@ public:
 	void EquipWeapon(ABaseWeapon* WeaponToEquip);
 	void FireButtonPressed(bool bPressed);
 	void Reload();
+	void ThrowGrenade();
 
 	UFUNCTION(BlueprintCallable)
 	void ShotgunShellReload();
@@ -65,8 +66,13 @@ protected:
 	UFUNCTION(Server, Reliable)
 	void ServerReload();
 
+	UFUNCTION(Server, Reliable)
+	void ServerThrowGrenade();
+
 	UFUNCTION(BlueprintCallable)
 	void FinishReloading();
+
+	void ThrowGrenadeFinished();
 
 	void HandleReload();
 

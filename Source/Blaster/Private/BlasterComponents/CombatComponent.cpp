@@ -16,7 +16,7 @@
 #include "TimerManager.h"
 #include "Sound/SoundCue.h"
 #include "TimerManager.h"
-
+PRAGMA_DISABLE_OPTIMIZATION
 UCombatComponent::UCombatComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
@@ -73,7 +73,7 @@ void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
  
 void UCombatComponent::EquipWeapon(ABaseWeapon* WeaponToEquip)
 {
-	if (Character && WeaponToEquip)
+	if (Character && WeaponToEquip && CombatState == ECombatState::ECS_Unoccupied)
 	{
 		if (EquippedWeapon)
 		{
@@ -126,9 +126,35 @@ void UCombatComponent::EquipWeapon(ABaseWeapon* WeaponToEquip)
 
 void UCombatComponent::Reload()
 {
-	if (CarryAmmo > 0 && CombatState != ECombatState::ECS_Reloading)
+	if (CarryAmmo > 0 && CombatState == ECombatState::ECS_Unoccupied)
 	{
 		ServerReload();
+	}
+}
+
+void UCombatComponent::ThrowGrenade()
+{
+	if (CombatState != ECombatState::ECS_Unoccupied)
+	{
+		return;
+	}
+	
+	if (Character)
+	{
+		if (Character->HasAuthority())
+		{
+			CombatState = ECombatState::ECS_ThrowingGrenade;
+		}
+
+		if (Character->IsLocallyControlled())
+		{
+			Character->PlayThrowGrenadeMontage();
+		}		
+	}
+
+	if (Character && !Character->HasAuthority())
+	{
+		ServerThrowGrenade();
 	}
 }
 
@@ -236,6 +262,13 @@ void UCombatComponent::OnRep_CombatState()
 			{
 				Fire();
 			}
+			break;
+		case ECombatState::ECS_ThrowingGrenade:
+			if (Character && !Character->IsLocallyControlled())
+			{
+				Character->PlayThrowGrenadeMontage();
+			}
+			break;
 	}
 }
 
@@ -415,6 +448,15 @@ void UCombatComponent::ServerReload_Implementation()
 	HandleReload();
 }
 
+void UCombatComponent::ServerThrowGrenade_Implementation()
+{
+	CombatState = ECombatState::ECS_ThrowingGrenade;
+	if (Character)
+	{
+		Character->PlayThrowGrenadeMontage();
+	}
+}
+
 void UCombatComponent::FinishReloading()
 {
 	if (Character != nullptr && Character->HasAuthority())
@@ -426,6 +468,14 @@ void UCombatComponent::FinishReloading()
 	if (bFireButtonPressed)
 	{
 		Fire();
+	}
+}
+
+void UCombatComponent::ThrowGrenadeFinished()
+{
+	if (Character && Character->HasAuthority())
+	{
+		CombatState = ECombatState::ECS_Unoccupied;
 	}
 }
 
@@ -597,3 +647,4 @@ void UCombatComponent::SetHudText()
 		Controller->SetTextWeaponType(EquippedWeapon->GetWeaponType());
 	}
 }
+PRAGMA_ENABLE_OPTIMIZATION

@@ -46,6 +46,7 @@ public:
 	void PlayReloadMontage();
 	void SetOverlappingWeapon(ABaseWeapon* Weapon);
 	void PlayElimintationMontage();
+	void PlayThrowGrenadeMontage();
 	void Eliminate();
 
 	UFUNCTION(NetMulticast, Reliable)
@@ -107,6 +108,7 @@ protected:
 	void FireButtonReleased();
 
 	void ReloadButtonPressed();
+	void GrenadeButtonPressed();
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = Camera)
@@ -190,6 +192,9 @@ private:
 
 	void EliminateTimerFinished();
 
+	UFUNCTION()
+	void OnMontageEnded(UAnimMontage* Montage, bool bInterrupted);
+
 	float AO_Yaw;
 	float AO_Pitch;
 	float InterpAO_Yaw;
@@ -233,4 +238,7 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = Combat)
 	UAnimMontage* EliminationMontage;	
+
+	UPROPERTY(EditAnywhere, Category = Combat)
+	UAnimMontage* ThrowGrenadeMontage;
 };
