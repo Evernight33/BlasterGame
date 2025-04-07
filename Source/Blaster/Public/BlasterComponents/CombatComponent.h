@@ -76,6 +76,12 @@ protected:
 
 	void HandleReload();
 
+	void DropEquippedWeapon() const;
+	void AttachActorToHand(AActor* ActorToAttach, const FName& HandName);
+	void UpdateCarryAmmo();
+	void PlayEquippedWeaponSound();
+	void ReloadEmptyWeapon();
+
 	int32 AmountToReload();
 
 private:
