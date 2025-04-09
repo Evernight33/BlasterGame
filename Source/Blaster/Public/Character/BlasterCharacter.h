@@ -180,6 +180,13 @@ private:
 	UPROPERTY()
 	ABlasterPlayerState* BlasterPlayerState;
 
+	/*
+	* Grenade
+	*/
+
+	UPROPERTY(VisibleAnywhere)
+	UStaticMeshComponent* AttachedGrenade;
+
 	UFUNCTION()
 	void UpdateDissolveMaterial(float DissolveValue);
 	void StartDissolve();

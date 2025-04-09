@@ -98,7 +98,7 @@ void UCombatComponent::EquipWeapon(ABaseWeapon* WeaponToEquip)
 
 void UCombatComponent::Reload()
 {
-	if (CarryAmmo > 0 && CombatState == ECombatState::ECS_Unoccupied)
+	if (CarryAmmo > 0 && CombatState == ECombatState::ECS_Unoccupied && EquippedWeapon && !EquippedWeapon->IsFull())
 	{
 		ServerReload();
 	}
