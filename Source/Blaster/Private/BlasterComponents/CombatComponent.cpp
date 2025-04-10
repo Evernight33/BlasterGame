@@ -16,7 +16,7 @@
 #include "TimerManager.h"
 #include "Sound/SoundCue.h"
 #include "TimerManager.h"
-PRAGMA_DISABLE_OPTIMIZATION
+
 UCombatComponent::UCombatComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
@@ -106,7 +106,7 @@ void UCombatComponent::Reload()
 
 void UCombatComponent::ThrowGrenade()
 {
-	if (CombatState != ECombatState::ECS_Unoccupied)
+	if (CombatState != ECombatState::ECS_Unoccupied || EquippedWeapon == nullptr)
 	{
 		return;
 	}
@@ -118,8 +118,10 @@ void UCombatComponent::ThrowGrenade()
 			CombatState = ECombatState::ECS_ThrowingGrenade;
 		}
 
-		if (Character->IsLocallyControlled() && EquippedWeapon)
+		if (Character->IsLocallyControlled())
 		{
+			ShowAttachedGrenade(true);
+
 			Character->PlayThrowGrenadeMontage();
 			if (EquippedWeapon->GetWeaponType() == EWeaponType::EWT_Pistol || EquippedWeapon->GetWeaponType() == EWeaponType::EWT_SubmachineGun)
 			{
@@ -153,6 +155,14 @@ void UCombatComponent::JumpToShotgunEnd()
 	if (AnimInstance && Character->GetReloadMontage())
 	{
 		AnimInstance->Montage_JumpToSection(FName("ShotgunEnd"));
+	}
+}
+
+void UCombatComponent::ShowAttachedGrenade(bool bVisible)
+{
+	if (Character && Character->GetAttachedGrenade())
+	{
+		Character->GetAttachedGrenade()->SetVisibility(bVisible);
 	}
 }
 
@@ -235,6 +245,7 @@ void UCombatComponent::OnRep_CombatState()
 			break;
 		case ECombatState::ECS_Unoccupied:
 			AttachActorToHand(EquippedWeapon, FName("RightHandSocket"));
+			ShowAttachedGrenade(false);
 			if (bFireButtonPressed)
 			{
 				Fire();
@@ -252,6 +263,7 @@ void UCombatComponent::OnRep_CombatState()
 					AttachActorToHand(EquippedWeapon, FName("LeftHandSocket"));
 				}
 				
+				ShowAttachedGrenade(true);
 				Character->PlayThrowGrenadeMontage();
 			}
 			break;
@@ -454,6 +466,8 @@ void UCombatComponent::ServerThrowGrenade_Implementation()
 		AttachActorToHand(EquippedWeapon, FName("LeftHandSocket"));
 	}
 
+	ShowAttachedGrenade(true);
+
 	CombatState = ECombatState::ECS_ThrowingGrenade;
 	if (Character)
 	{
@@ -479,6 +493,7 @@ void UCombatComponent::ThrowGrenadeFinished()
 {
 	if (Character && EquippedWeapon && Character->HasAuthority())
 	{
+		ShowAttachedGrenade(false);
 		AttachActorToHand(EquippedWeapon, FName("RightHandSocket"));
 		CombatState = ECombatState::ECS_Unoccupied;
 	}
@@ -551,6 +566,8 @@ void UCombatComponent::ReloadEmptyWeapon()
 		Reload();
 	}
 }
+
+
 
 int32 UCombatComponent::AmountToReload()
 {
@@ -712,4 +729,3 @@ void UCombatComponent::SetHudText()
 		Controller->SetTextWeaponType(EquippedWeapon->GetWeaponType());
 	}
 }
-PRAGMA_ENABLE_OPTIMIZATION

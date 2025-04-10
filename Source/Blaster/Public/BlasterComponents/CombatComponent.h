@@ -36,6 +36,7 @@ public:
 	void ShotgunShellReload();
 	
 	void JumpToShotgunEnd();
+	void ShowAttachedGrenade(bool bVisible);
 
 protected:
 	virtual void BeginPlay() override;

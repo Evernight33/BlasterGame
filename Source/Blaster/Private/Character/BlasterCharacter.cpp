@@ -247,6 +247,14 @@ void ABlasterCharacter::MulticastEliminate_Implementation()
 	}
 }
 
+void ABlasterCharacter::MulticastThrowGrenade_Implementation()
+{
+	if (Combat && !HasAuthority())
+	{
+		Combat->ShowAttachedGrenade(false);
+	}	
+}
+
 void ABlasterCharacter::TurnInPlace(float DeltaTime)
 {
 	UE_LOG(LogTemp, Display, TEXT("AO_Yaw: %f"), AO_Yaw);
@@ -488,6 +496,11 @@ void ABlasterCharacter::BeginPlay()
 	if (HasAuthority())
 	{
 		OnTakeAnyDamage.AddDynamic(this, &ABlasterCharacter::ReceiveDamage);
+	}
+
+	if (AttachedGrenade)
+	{
+		AttachedGrenade->SetVisibility(false);
 	}
 
 	if (HasAuthority())
