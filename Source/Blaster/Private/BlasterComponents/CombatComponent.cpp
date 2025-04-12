@@ -5,6 +5,7 @@
 #include "Blaster/Public/Weapon/BaseWeapon.h"
 #include "Blaster/Public/Character/BlasterCharacter.h"
 #include "Blaster/Public/Character/BlasterAnimInstance.h"
+#include "Blaster/Public/Weapon/Projectile.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "Components/SphereComponent.h"
 #include "Net/UnrealNetwork.h"
@@ -136,7 +137,7 @@ void UCombatComponent::ThrowGrenade()
 
 	if (Character && !Character->HasAuthority())
 	{
-		ServerThrowGrenade();
+		ServerThrowGrenade(HitTarget);
 	}
 }
 
@@ -455,8 +456,10 @@ void UCombatComponent::ServerReload_Implementation()
 	HandleReload();
 }
 
-void UCombatComponent::ServerThrowGrenade_Implementation()
+void UCombatComponent::ServerThrowGrenade_Implementation(const FVector_NetQuantize& Target)
 {
+	HitTarget = Target;
+
 	if (EquippedWeapon->GetWeaponType() == EWeaponType::EWT_Pistol || EquippedWeapon->GetWeaponType() == EWeaponType::EWT_SubmachineGun)
 	{
 		AttachActorToHand(EquippedWeapon, FName("LeftHandPistolSocket"));

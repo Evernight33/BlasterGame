@@ -20,6 +20,9 @@ class BLASTER_API AProjectile : public AActor
 	GENERATED_BODY()
 	
 public:	
+	UPROPERTY(VisibleAnywhere)
+	UStaticMeshComponent* ProjectileMesh;
+
 	AProjectile();
 
 protected:
@@ -53,9 +56,6 @@ protected:
 
 	UPROPERTY()
 	UNiagaraComponent* TrailSystemComponent;
-
-	UPROPERTY(VisibleAnywhere)
-	UStaticMeshComponent* ProjectileMesh;
 
 	UPROPERTY(EditAnywhere)
 	float DamageInnerRadius = 200.0;

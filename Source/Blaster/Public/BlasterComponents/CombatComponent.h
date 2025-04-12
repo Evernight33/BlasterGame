@@ -14,6 +14,7 @@ class ABaseWeapon;
 class ABlasterCharacter;
 class ABlasterPlayerController;
 class ABlasterHUD;
+class AProjectile;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class BLASTER_API UCombatComponent : public UActorComponent
@@ -22,6 +23,11 @@ class BLASTER_API UCombatComponent : public UActorComponent
 
 public:	
 	friend class ABlasterCharacter;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AProjectile> GrenadeClass;
+
+	FVector HitTarget;
 
 	UCombatComponent();
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
@@ -38,7 +44,7 @@ public:
 	void JumpToShotgunEnd();
 	void ShowAttachedGrenade(bool bVisible);
 
-protected:
+protected:	
 	virtual void BeginPlay() override;
 	void SetAiming(bool bIsAiming);
 
@@ -68,7 +74,7 @@ protected:
 	void ServerReload();
 
 	UFUNCTION(Server, Reliable)
-	void ServerThrowGrenade();
+	void ServerThrowGrenade(const FVector_NetQuantize& Target);
 
 	UFUNCTION(BlueprintCallable)
 	void FinishReloading();
@@ -118,9 +124,8 @@ private:
 	FTimerHandle EquipTimer;
 
 	/*
-	* Hud and crosshairs
-	*/
-	FVector HitTarget;
+	* Hud
+	*/	
 	FHUDPackage HUDPackage;
 
 	float CrosshairTraceLength = 8000.f;
