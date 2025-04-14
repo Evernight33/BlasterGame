@@ -22,6 +22,7 @@ public:
 	void SetHUDWeaponAmmo(int32 Ammo);
 	void SetHUDAnnouncementCountDown(float CountdownTime);
 	void SetHUDCarriedAmmo(int32 Ammo);
+	void SetHUDGrenades(int32 Grenades);
 	void SetElimTextVisibility(bool IsVisible);
 	void SetTextWeaponType(EWeaponType WeaponType);
 	void SetTextWeaponTypeInvisible();
@@ -35,6 +36,8 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void ReceivedPlayer() override; // Sync with server clock as soon as possible
 	virtual float GetServerTime(); // Sync with Server world clock
+
+	int32 ControllerGrenades = 4;
 
 protected:
 	virtual void BeginPlay() override;
@@ -78,6 +81,8 @@ private:
 	float CooldownTime = 0.0f;
 	uint32 CountdownInt = 0;
 	bool bIsTimerSet = false;
+	
+	
 
 	FTimerHandle BlinkingTimer;
 

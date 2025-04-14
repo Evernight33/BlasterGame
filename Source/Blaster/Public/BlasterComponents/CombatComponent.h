@@ -44,6 +44,9 @@ public:
 	void JumpToShotgunEnd();
 	void ShowAttachedGrenade(bool bVisible);
 
+	FORCEINLINE int32 GetGrenades() const { return Grenades; }
+	FORCEINLINE void SetGrenades(int32 GrenadesAmount) { Grenades = GrenadesAmount; }
+
 protected:	
 	virtual void BeginPlay() override;
 	void SetAiming(bool bIsAiming);
@@ -172,9 +175,18 @@ private:
 	UPROPERTY(EditAnywhere)
 	int32 StartingGrenadeLauncherAmmo = 0;
 
+	UPROPERTY(EditAnywhere)
+	int32 MaxGrenades = 4;
+
+	UPROPERTY(ReplicatedUsing = OnRep_Grenades)
+	int32 Grenades;
+
 	FTimerHandle FireTimer;
 
 	TMap<EWeaponType, int32> CarryAmmoMap;
+
+	UFUNCTION()
+	void OnRep_Grenades();
 
 	void InterpFOV(float DeltaTime);
 
@@ -186,4 +198,5 @@ private:
 	void UpdateAmmoValues();
 	void UpdateShotunAmmoValues();
 	void SetHudText();
+	void UpdateHudGrenades();
 };

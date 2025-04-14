@@ -180,6 +180,7 @@ void ABlasterCharacter::MulticastEliminate_Implementation()
 	if (BlasterPlayerController)
 	{
 		BlasterPlayerController->SetHUDWeaponAmmo(0);
+		BlasterPlayerController->ControllerGrenades = Combat->Grenades;
 	}
 
 	bEliminated = true;
@@ -697,6 +698,11 @@ void ABlasterCharacter::SimProxiesTurn()
 
 void ABlasterCharacter::ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatorController, AActor* DamageCauser)
 {
+	if (bEliminated)
+	{
+		return;
+	}
+
 	Health = FMath::Clamp(Health - Damage, 0.f, MaxHealth);
 
 	UpdateHUDHealth();
@@ -740,7 +746,13 @@ void ABlasterCharacter::PollInit()
 			if (BlasterPlayerController)
 			{
 				BlasterPlayerController->SetTextWeaponTypeInvisible();
-			}
+
+				if (GetCombat())
+				{
+					GetCombat()->SetGrenades(BlasterPlayerController->ControllerGrenades);
+					BlasterPlayerController->SetHUDGrenades(BlasterPlayerController->ControllerGrenades);
+				}
+			}			
 		}
 	}
 }

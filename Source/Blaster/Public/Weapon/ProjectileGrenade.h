@@ -17,12 +17,6 @@ class BLASTER_API AProjectileGrenade : public AProjectile
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere)
-	UStaticMesh* GrenadeDefaultMesh;
-
-	UPROPERTY(EditAnywhere)
-	UStaticMesh* GrenadeThrownMesh;
-
 	AProjectileGrenade();
 
 	virtual void Destroyed() override;

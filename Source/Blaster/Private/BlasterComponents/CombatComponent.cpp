@@ -70,6 +70,7 @@ void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME(UCombatComponent, bAiming);
 	DOREPLIFETIME_CONDITION(UCombatComponent, CarryAmmo, COND_OwnerOnly);
 	DOREPLIFETIME(UCombatComponent, CombatState);
+	DOREPLIFETIME(UCombatComponent, Grenades);
 }
  
 void UCombatComponent::EquipWeapon(ABaseWeapon* WeaponToEquip)
@@ -107,7 +108,7 @@ void UCombatComponent::Reload()
 
 void UCombatComponent::ThrowGrenade()
 {
-	if (CombatState != ECombatState::ECS_Unoccupied || EquippedWeapon == nullptr)
+	if (CombatState != ECombatState::ECS_Unoccupied || EquippedWeapon == nullptr || Grenades == 0)
 	{
 		return;
 	}
@@ -117,6 +118,14 @@ void UCombatComponent::ThrowGrenade()
 		if (Character->HasAuthority())
 		{
 			CombatState = ECombatState::ECS_ThrowingGrenade;
+
+			Controller = !Controller ? Cast<ABlasterPlayerController>(Character->GetController()) : Controller;
+			if (Controller)
+			{
+				Controller->ControllerGrenades -= 1;
+				Grenades = Controller->ControllerGrenades;
+				UpdateHudGrenades();
+			}
 		}
 
 		if (Character->IsLocallyControlled())
@@ -446,7 +455,7 @@ void UCombatComponent::SetHUDCrosshairs(float DeltaTime)
 
 void UCombatComponent::ServerReload_Implementation()
 {
-	if (!Character || !EquippedWeapon)
+	if (!Character || !EquippedWeapon || Grenades == 0)
 	{
 		return;
 	}
@@ -476,6 +485,13 @@ void UCombatComponent::ServerThrowGrenade_Implementation(const FVector_NetQuanti
 	{
 		Character->PlayThrowGrenadeMontage();
 	}
+
+	Controller = !Controller ? Cast<ABlasterPlayerController>(Character->GetController()) : Controller;
+	if (Controller)
+	{
+		Controller->ControllerGrenades -= 1;
+		Grenades = Controller->ControllerGrenades;
+	}	
 }
 
 void UCombatComponent::FinishReloading()
@@ -590,6 +606,11 @@ int32 UCombatComponent::AmountToReload()
 	}
 
 	return int32();
+}
+
+void UCombatComponent::OnRep_Grenades()
+{
+	UpdateHudGrenades();
 }
 
 void UCombatComponent::InterpFOV(float DeltaTime)
@@ -730,5 +751,14 @@ void UCombatComponent::SetHudText()
 	if (Controller && EquippedWeapon)
 	{
 		Controller->SetTextWeaponType(EquippedWeapon->GetWeaponType());
+	}
+}
+
+void UCombatComponent::UpdateHudGrenades()
+{
+	Controller = !Controller ? Cast<ABlasterPlayerController>(Character->GetController()) : Controller;
+	if (Controller && EquippedWeapon)
+	{
+		Controller->SetHUDGrenades(Grenades);
 	}
 }
