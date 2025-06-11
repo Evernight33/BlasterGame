@@ -21,6 +21,7 @@ class ABlasterPlayerController;
 class AController;
 class USoundCue;
 class ABlasterPlayerState;
+class AKnife;
 
 UCLASS()
 class BLASTER_API ABlasterCharacter : public ACharacter, public IInteractWithCrosshairsInterface
@@ -47,7 +48,9 @@ public:
 	void SetOverlappingWeapon(ABaseWeapon* Weapon);
 	void PlayElimintationMontage();
 	void PlayThrowGrenadeMontage();
+	void PlayKnifeStabMontage();
 	void Eliminate();
+	void PerformKnifeStab();
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastEliminate();		
@@ -70,6 +73,8 @@ public:
 	FORCEINLINE bool GetDisableGameplay() const { return bDisableGameplay; }
 	FORCEINLINE UAnimMontage* GetReloadMontage() const { return ReloadMontage; }
 	FORCEINLINE UStaticMeshComponent* GetAttachedGrenade() const { return AttachedGrenade;}
+	FORCEINLINE UStaticMeshComponent* GetAttachedKnife() const { return AttachedKnife; }
+	FORCEINLINE void SetCanKnifeStab(bool pCanKnifeSTab) { bCanStab = pCanKnifeSTab; }
 
 	ECombatState GetCombatState() const;
 
@@ -113,6 +118,7 @@ protected:
 
 	void ReloadButtonPressed();
 	void GrenadeButtonPressed();
+	void KnifeStabButtonPressed();
 
 private:
 	UPROPERTY(VisibleAnywhere, Category = Camera)
@@ -191,6 +197,9 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* AttachedGrenade;
 
+	UPROPERTY(VisibleAnywhere)
+	UStaticMeshComponent* AttachedKnife;
+
 	UFUNCTION()
 	void UpdateDissolveMaterial(float DissolveValue);
 	void StartDissolve();
@@ -206,6 +215,8 @@ private:
 	UFUNCTION()
 	void OnMontageEnded(UAnimMontage* Montage, bool bInterrupted);
 
+	AKnife* Knife;
+
 	float AO_Yaw;
 	float AO_Pitch;
 	float InterpAO_Yaw;
@@ -213,6 +224,10 @@ private:
 	bool bRotateRootBone;
 	bool bEliminated;
 	float TurnThreshold = 0.5f;
+
+
+	UPROPERTY(Replicated)
+	bool bCanStab = false;
 
 	FRotator ProxyRotationLastFrame;
 	FRotator ProxyRotationCurrentFrame;
@@ -252,4 +267,7 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = Combat)
 	UAnimMontage* ThrowGrenadeMontage;
+
+	UPROPERTY(EditAnywhere, Category = Combat)
+	UAnimMontage* KnifeStabMontage;
 };

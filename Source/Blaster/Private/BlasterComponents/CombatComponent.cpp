@@ -30,10 +30,12 @@ void UCombatComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+	ShowAttachedKnife(false);
+
 	if (Character)
 	{
 		Character->GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
-
+		
 		if (UCameraComponent* FollowCamera = Character->GetFollowCamera())
 		{
 			DefaultFOV = FollowCamera->FieldOfView;
@@ -150,6 +152,51 @@ void UCombatComponent::ThrowGrenade()
 	}
 }
 
+void UCombatComponent::KnifeStab()
+{
+	if (CombatState != ECombatState::ECS_Unoccupied)
+	{
+		return;
+	}
+
+	if (Character)
+	{
+		if (!Character->GetEquippedWeapon())
+		{
+			return;
+		}
+
+		if (Character->HasAuthority())
+		{
+			CombatState = ECombatState::ECS_KnifeStabbing;
+			Character->GetWorldTimerManager().SetTimer(
+				KnifeStabTimer,
+				this,
+				&UCombatComponent::KnifeStabTimerFunction,
+				0.05f,
+				true);
+		}
+		else
+		{
+			ServerKnifeStab();
+		}
+
+		if (Character->IsLocallyControlled())
+		{
+			ShowAttachedKnife(true);
+			Character->PlayKnifeStabMontage();			
+		}
+	}
+}
+
+void UCombatComponent::KnifeStabTimerFunction()
+{
+	if (Character)
+	{
+		Character->PerformKnifeStab();
+	}
+}
+
 void UCombatComponent::ShotgunShellReload()
 {
 	if (Character && Character->HasAuthority())
@@ -173,6 +220,14 @@ void UCombatComponent::ShowAttachedGrenade(bool bVisible)
 	if (Character && Character->GetAttachedGrenade())
 	{
 		Character->GetAttachedGrenade()->SetVisibility(bVisible);
+	}
+}
+
+void UCombatComponent::ShowAttachedKnife(bool bVisible)
+{
+	if (Character && Character->GetAttachedKnife())
+	{
+		Character->GetAttachedKnife()->SetVisibility(bVisible);
 	}
 }
 
@@ -256,6 +311,7 @@ void UCombatComponent::OnRep_CombatState()
 		case ECombatState::ECS_Unoccupied:
 			AttachActorToHand(EquippedWeapon, FName("RightHandSocket"));
 			ShowAttachedGrenade(false);
+			ShowAttachedKnife(false);
 			if (bFireButtonPressed)
 			{
 				Fire();
@@ -276,6 +332,9 @@ void UCombatComponent::OnRep_CombatState()
 				ShowAttachedGrenade(true);
 				Character->PlayThrowGrenadeMontage();
 			}
+		case ECombatState::ECS_KnifeStabbing:
+			ShowAttachedKnife(true);
+			Character->PlayKnifeStabMontage();
 			break;
 	}
 }
@@ -294,11 +353,11 @@ void UCombatComponent::ServerFire_Implementation(const FVector_NetQuantize& Trac
 {
 	if (EquippedWeapon->GetWeaponType() == EWeaponType::EWT_Pistol || EquippedWeapon->GetWeaponType() == EWeaponType::EWT_SubmachineGun)
 	{
-		AttachActorToHand(EquippedWeapon, FName("LeftHandPistolSocket"));
+		AttachActorToHand(EquippedWeapon, FName("RightHandSocket"));
 	}
 	else
 	{
-		AttachActorToHand(EquippedWeapon, FName("LeftHandSocket"));
+		AttachActorToHand(EquippedWeapon, FName("RightHandSocket"));
 	}
 
 	MulticastFire(TraceHitTarget);
@@ -494,6 +553,23 @@ void UCombatComponent::ServerThrowGrenade_Implementation(const FVector_NetQuanti
 	}	
 }
 
+void UCombatComponent::ServerKnifeStab_Implementation()
+{
+	ShowAttachedKnife(true);
+	CombatState = ECombatState::ECS_KnifeStabbing;
+
+	if (Character)
+	{
+		Character->PlayKnifeStabMontage();
+		Character->GetWorldTimerManager().SetTimer(
+			KnifeStabTimer,
+			this,
+			&UCombatComponent::KnifeStabTimerFunction,
+			0.05f,
+			true);
+	}		
+}
+
 void UCombatComponent::FinishReloading()
 {
 	if (Character != nullptr && Character->HasAuthority())
@@ -514,6 +590,16 @@ void UCombatComponent::ThrowGrenadeFinished()
 	{
 		ShowAttachedGrenade(false);
 		AttachActorToHand(EquippedWeapon, FName("RightHandSocket"));
+		CombatState = ECombatState::ECS_Unoccupied;
+	}
+}
+
+void UCombatComponent::KnifeStabFinished()
+{
+	if (Character && Character->HasAuthority())
+	{
+		Character->GetWorldTimerManager().ClearTimer(KnifeStabTimer);
+		ShowAttachedKnife(false);
 		CombatState = ECombatState::ECS_Unoccupied;
 	}
 }

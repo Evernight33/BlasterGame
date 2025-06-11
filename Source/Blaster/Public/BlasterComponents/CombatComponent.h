@@ -29,6 +29,8 @@ public:
 
 	FVector HitTarget;
 
+	FTimerHandle KnifeStabTimer;
+
 	UCombatComponent();
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -37,12 +39,15 @@ public:
 	void FireButtonPressed(bool bPressed);
 	void Reload();
 	void ThrowGrenade();
+	void KnifeStab();
+	void KnifeStabTimerFunction();
 
 	UFUNCTION(BlueprintCallable)
 	void ShotgunShellReload();
 	
 	void JumpToShotgunEnd();
 	void ShowAttachedGrenade(bool bVisible);
+	void ShowAttachedKnife(bool bVisible);
 
 	FORCEINLINE int32 GetGrenades() const { return Grenades; }
 	FORCEINLINE void SetGrenades(int32 GrenadesAmount) { Grenades = GrenadesAmount; }
@@ -79,10 +84,14 @@ protected:
 	UFUNCTION(Server, Reliable)
 	void ServerThrowGrenade(const FVector_NetQuantize& Target);
 
+	UFUNCTION(Server, Reliable)
+	void ServerKnifeStab();
+
 	UFUNCTION(BlueprintCallable)
 	void FinishReloading();
 
 	void ThrowGrenadeFinished();
+	void KnifeStabFinished();
 
 	void HandleReload();
 

@@ -21,6 +21,7 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "Blaster/Public/PlayerState/BlasterPlayerState.h"
 #include "Blaster/Public/Weapon/WeaponTypes.h"
+#include "Blaster/Public/Weapon/Knife.h"
 
 ABlasterCharacter::ABlasterCharacter()
 {
@@ -45,6 +46,8 @@ ABlasterCharacter::ABlasterCharacter()
 
 	OverheadWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("OverheadWidget"));
 	OverheadWidget->SetupAttachment(RootComponent);
+
+	Knife = CreateDefaultSubobject<AKnife>(TEXT("Knife"));
 
 	Combat = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
 	Combat->SetIsReplicated(true);
@@ -77,6 +80,12 @@ ABlasterCharacter::ABlasterCharacter()
 	AttachedGrenade = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Attached Grenade"));
 	AttachedGrenade->SetupAttachment(GetMesh(), FName("GrenadeSocket"));
 	AttachedGrenade->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	AttachedKnife = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Attached Knife"));
+	AttachedKnife->SetupAttachment(GetMesh(), FName("LeftHandKnifeSocket"));
+	AttachedKnife->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	AttachedKnife->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	//AttachedKnife->OnComponentBeginOverlap.AddDynamic(this, &ABlasterCharacter::OnKnifeStabbed);
 }
 
 void ABlasterCharacter::Tick(float DeltaTime)
@@ -93,7 +102,8 @@ void ABlasterCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME_CONDITION(ABlasterCharacter, OverlappingWeapon, COND_OwnerOnly);
 	DOREPLIFETIME(ABlasterCharacter, Health);
-	DOREPLIFETIME(ABlasterCharacter, bDisableGameplay)
+	DOREPLIFETIME(ABlasterCharacter, bDisableGameplay);
+	DOREPLIFETIME(ABlasterCharacter, bCanStab);
 }
 
 void ABlasterCharacter::UpdateDissolveMaterial(float DissolveValue)
@@ -152,6 +162,15 @@ void ABlasterCharacter::PlayThrowGrenadeMontage()
 	}
 }
 
+void ABlasterCharacter::PlayKnifeStabMontage()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance && KnifeStabMontage)
+	{
+		AnimInstance->Montage_Play(KnifeStabMontage);
+	}
+}
+
 void ABlasterCharacter::Eliminate()
 {
 	if (!IsFirstEliminationCall)
@@ -172,6 +191,7 @@ void ABlasterCharacter::Eliminate()
 	if (Combat && Combat->EquippedWeapon)
 	{
 		Combat->EquippedWeapon->DropWeapon();
+		Combat->ShowAttachedKnife(false);
 	}
 }
 
@@ -197,6 +217,11 @@ void ABlasterCharacter::MulticastEliminate_Implementation()
 			DynamicDissolveMaterialInstance->SetScalarParameterValue(TEXT("Glow"), 200.f);
 
 			StartDissolve();
+		}
+
+		if (Combat)
+		{
+			Combat->ShowAttachedKnife(false);
 		}
 	}
 
@@ -357,6 +382,8 @@ void ABlasterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 	PlayerInputComponent->BindAction("Reload", IE_Pressed, this, &ABlasterCharacter::ReloadButtonPressed);
 	PlayerInputComponent->BindAction("ThrowGrenade", IE_Pressed, this, &ABlasterCharacter::GrenadeButtonPressed);
+
+	PlayerInputComponent->BindAction("KnifeStab", IE_Pressed, this, &ABlasterCharacter::KnifeStabButtonPressed);
 }
 
 void ABlasterCharacter::PostInitializeComponents()
@@ -830,6 +857,16 @@ void ABlasterCharacter::GrenadeButtonPressed()
 	}
 }
 
+void ABlasterCharacter::KnifeStabButtonPressed()
+{
+	if (Combat)
+	{
+		AttachedKnife->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		AttachedKnife->SetGenerateOverlapEvents(true);
+		Combat->KnifeStab();
+	}
+}
+
 void ABlasterCharacter::OnRep_Health()
 {
 	UpdateHUDHealth();
@@ -882,6 +919,49 @@ void ABlasterCharacter::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
 	if (Montage == ThrowGrenadeMontage && Combat)
 	{
 		Combat->ThrowGrenadeFinished();
+	}
+
+	if (Montage == KnifeStabMontage && Combat)
+	{
+		Combat->KnifeStabFinished();
+	}
+}
+
+void ABlasterCharacter::PerformKnifeStab()
+{
+	FVector Start = AttachedKnife->GetComponentLocation();
+	FVector End = Start + AttachedKnife->GetUpVector() * 50.f;
+
+	FVector KnifeBox(5.f, 5.f, 0.5f);
+
+	TArray<AActor*> IgnoredActors;
+	IgnoredActors.Add(this);
+
+	FHitResult KnifeHit;
+	bool bHit = UKismetSystemLibrary::BoxTraceSingle(
+	this, 
+	Start,
+	End,
+	KnifeBox,
+	AttachedKnife->GetComponentRotation(),
+	ETraceTypeQuery::TraceTypeQuery1,
+	false,
+	IgnoredActors,
+	EDrawDebugTrace::None,
+	KnifeHit,
+	true);
+
+	if (bCanStab && bHit && Cast<ABlasterCharacter>(KnifeHit.GetActor()) && KnifeHit.GetActor() != this)
+	{
+		UGameplayStatics::ApplyDamage(
+			KnifeHit.GetActor(),
+			100.0,
+			Controller,
+			this,
+			UDamageType::StaticClass()
+		);
+
+		bCanStab = false;
 	}
 }
 
