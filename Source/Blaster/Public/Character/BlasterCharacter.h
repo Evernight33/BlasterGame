@@ -21,7 +21,6 @@ class ABlasterPlayerController;
 class AController;
 class USoundCue;
 class ABlasterPlayerState;
-class AKnife;
 
 UCLASS()
 class BLASTER_API ABlasterCharacter : public ACharacter, public IInteractWithCrosshairsInterface
@@ -214,8 +213,6 @@ private:
 
 	UFUNCTION()
 	void OnMontageEnded(UAnimMontage* Montage, bool bInterrupted);
-
-	AKnife* Knife;
 
 	float AO_Yaw;
 	float AO_Pitch;

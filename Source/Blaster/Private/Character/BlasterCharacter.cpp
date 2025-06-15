@@ -21,7 +21,6 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "Blaster/Public/PlayerState/BlasterPlayerState.h"
 #include "Blaster/Public/Weapon/WeaponTypes.h"
-#include "Blaster/Public/Weapon/Knife.h"
 
 ABlasterCharacter::ABlasterCharacter()
 {
@@ -46,8 +45,6 @@ ABlasterCharacter::ABlasterCharacter()
 
 	OverheadWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("OverheadWidget"));
 	OverheadWidget->SetupAttachment(RootComponent);
-
-	Knife = CreateDefaultSubobject<AKnife>(TEXT("Knife"));
 
 	Combat = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
 	Combat->SetIsReplicated(true);
