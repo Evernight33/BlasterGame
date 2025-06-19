@@ -48,9 +48,11 @@ public:
 	void JumpToShotgunEnd();
 	void ShowAttachedGrenade(bool bVisible);
 	void ShowAttachedKnife(bool bVisible);
+	void PickupAmmo(EWeaponType WeaponType, int32 AmmoAmount);
 
 	FORCEINLINE int32 GetGrenades() const { return Grenades; }
 	FORCEINLINE void SetGrenades(int32 GrenadesAmount) { Grenades = GrenadesAmount; }
+	FORCEINLINE ABaseWeapon* GetEquippedWeapon() { return EquippedWeapon; }
 
 protected:	
 	virtual void BeginPlay() override;
@@ -193,6 +195,9 @@ private:
 	FTimerHandle FireTimer;
 
 	TMap<EWeaponType, int32> CarryAmmoMap;
+
+	UPROPERTY(EditAnywhere)
+	int32 MaxCarryAmmo = 500;
 
 	UFUNCTION()
 	void OnRep_Grenades();

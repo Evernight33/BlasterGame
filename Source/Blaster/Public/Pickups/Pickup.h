@@ -32,6 +32,9 @@ protected:
 		const FHitResult& SweepResult
 	);
 
+	UPROPERTY(EditAnywhere)
+	float BaseTurnRate = 45;
+
 private:
 
 	UPROPERTY(EditAnywhere)
