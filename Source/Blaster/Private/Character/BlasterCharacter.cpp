@@ -9,6 +9,7 @@
 #include "Net/UnrealNetwork.h"
 #include "Blaster/Public/Weapon/BaseWeapon.h"
 #include "Blaster/Public/BlasterComponents/CombatComponent.h"
+#include "Blaster/Public/BlasterComponents/BuffComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Blaster/Public/Character/BlasterAnimInstance.h"
@@ -48,7 +49,10 @@ ABlasterCharacter::ABlasterCharacter()
 
 	Combat = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
 	Combat->SetIsReplicated(true);
-	
+
+	Buff = CreateDefaultSubobject<UBuffComponent>(TEXT("BuffComponent"));
+	Buff->SetIsReplicated(true);
+
 	if (GetCharacterMovement())
 	{
 		GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
@@ -390,6 +394,10 @@ void ABlasterCharacter::PostInitializeComponents()
 	if (Combat)
 	{
 		Combat->Character = this;
+	}
+	if (Buff)
+	{
+		Buff->Character = this;
 	}
 }
 

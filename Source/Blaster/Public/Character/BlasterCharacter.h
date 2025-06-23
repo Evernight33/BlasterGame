@@ -21,6 +21,8 @@ class ABlasterPlayerController;
 class AController;
 class USoundCue;
 class ABlasterPlayerState;
+class UCombatComponent;
+class UBuffComponent;
 
 UCLASS()
 class BLASTER_API ABlasterCharacter : public ACharacter, public IInteractWithCrosshairsInterface
@@ -134,6 +136,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UCombatComponent* Combat;
+
+	UPROPERTY(VisibleAnywhere)
+	UBuffComponent* Buff;
 
 	void CalculateAO_Pitch();
 	float CalculateSpeed();
