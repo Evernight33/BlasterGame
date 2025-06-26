@@ -15,15 +15,21 @@ class BLASTER_API UBuffComponent : public UActorComponent
 
 public:	
 	UBuffComponent();
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	
+	void Heal(float HealAmount, float HealingTime);
+
 	friend class ABlasterCharacter;
 
 protected:
 	virtual void BeginPlay() override;
+	void HealRampUp(float DeltaTime);
 
 private:
 	UPROPERTY()
 	ABlasterCharacter* Character;
 
-public:	
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	bool bHealing = false;
+	float HealingRate = 0;
+	float AmountToHeal = 0.f;
 };

@@ -52,6 +52,7 @@ public:
 	void PlayKnifeStabMontage();
 	void Eliminate();
 	void PerformKnifeStab();
+	void UpdateHUDHealth();
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastEliminate();		
@@ -70,12 +71,14 @@ public:
 	FORCEINLINE bool IsEliminated() const { return bEliminated; }
 	FORCEINLINE float GetMaxHealth() const { return MaxHealth; }
 	FORCEINLINE float GetHealth() const { return Health; }
+	FORCEINLINE void SetHealth(float pHealth) { Health = pHealth; }
 	FORCEINLINE UCombatComponent* GetCombat() const { return Combat; }
 	FORCEINLINE bool GetDisableGameplay() const { return bDisableGameplay; }
 	FORCEINLINE UAnimMontage* GetReloadMontage() const { return ReloadMontage; }
 	FORCEINLINE UStaticMeshComponent* GetAttachedGrenade() const { return AttachedGrenade;}
 	FORCEINLINE UStaticMeshComponent* GetAttachedKnife() const { return AttachedKnife; }
 	FORCEINLINE void SetCanKnifeStab(bool pCanKnifeSTab) { bCanStab = pCanKnifeSTab; }
+	FORCEINLINE UBuffComponent* GetBuff() const { return Buff; }
 
 	ECombatState GetCombatState() const;
 
@@ -104,8 +107,6 @@ protected:
 
 	UFUNCTION()
 	void ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatorController, AActor* DamageCauser);
-
-	void UpdateHUDHealth();
 
 	//Poll for any relevant classes and initialize our HUD
 	void PollInit();
@@ -154,7 +155,7 @@ private:
 	float Health = 100.f;
 
 	UFUNCTION()
-	void OnRep_Health();
+	void OnRep_Health(float LastHealth);
 
 	/**
 	* Dissolve
