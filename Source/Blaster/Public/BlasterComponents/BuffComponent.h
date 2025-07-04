@@ -18,6 +18,11 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	
 	void Heal(float HealAmount, float HealingTime);
+	void BuffSpeed(float BuffBaseSpeed, float BuffCrouchSpeed, float BuffTime);
+	void SetInitialSpeeds(float BaseSpeed, float CrouchSpeed);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastSpeedBuff(float BaseSpeed, float CrouchSpeed);
 
 	friend class ABlasterCharacter;
 
@@ -32,4 +37,16 @@ private:
 	bool bHealing = false;
 	float HealingRate = 0;
 	float AmountToHeal = 0.f;
+
+	/**
+	* Speed buff
+	*/
+
+	void ResetSpeeds();
+
+	FTimerHandle SpeedBuffTimer;
+	
+	float InitialBaseSpeed;
+	float InitialCrouchSpeed;
+
 };

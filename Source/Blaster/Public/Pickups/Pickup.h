@@ -8,6 +8,8 @@
 
 class USphereComponent;
 class USoundCue;
+class UNiagaraSystem;
+class UNiagaraComponent;
 
 UCLASS()
 class BLASTER_API APickup : public AActor
@@ -35,6 +37,12 @@ protected:
 	UPROPERTY(EditAnywhere)
 	float BaseTurnRate = 45;
 
+	UPROPERTY(VisibleAnywhere)
+	UNiagaraComponent* PickupEffectComponent;
+
+	UPROPERTY(EditAnywhere)
+	UNiagaraSystem* PickupEffect;
+
 private:
 
 	UPROPERTY(EditAnywhere)
@@ -45,7 +53,4 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* PickupMesh;
-
-public:	
-	
 };
