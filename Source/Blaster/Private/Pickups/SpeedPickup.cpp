@@ -25,4 +25,6 @@ void ASpeedPickup::OnSphereOverlap(
 			Buff->BuffSpeed(BaseSpeedBuff, CrouchSpeedBuff, SpeedBuffTime);
 		}
 	}
+
+	Destroy();
 }
