@@ -19,10 +19,15 @@ public:
 	
 	void Heal(float HealAmount, float HealingTime);
 	void BuffSpeed(float BuffBaseSpeed, float BuffCrouchSpeed, float BuffTime);
+	void BuffJump(float BuffJumpVelocity, float BuffTime);
 	void SetInitialSpeeds(float BaseSpeed, float CrouchSpeed);
+	void SetInitialJumpVelocity(float Velocity);
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastSpeedBuff(float BaseSpeed, float CrouchSpeed);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastJumpBuff(float JumpVelocity);
 
 	friend class ABlasterCharacter;
 
@@ -42,11 +47,19 @@ private:
 	* Speed buff
 	*/
 
+	FTimerHandle SpeedBuffTimer;	
 	void ResetSpeeds();
 
-	FTimerHandle SpeedBuffTimer;
-	
 	float InitialBaseSpeed;
 	float InitialCrouchSpeed;
+
+	/**
+	* Jump buff
+	*/
+	
+	FTimerHandle JumpBuffTimer;
+	void ResetJump();	
+	float InitialJumpVelocity;
+	
 
 };
