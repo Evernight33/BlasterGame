@@ -53,6 +53,7 @@ public:
 	void Eliminate();
 	void PerformKnifeStab();
 	void UpdateHUDHealth();
+	void UpdateHUDShield();
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastEliminate();		
@@ -71,7 +72,10 @@ public:
 	FORCEINLINE bool IsEliminated() const { return bEliminated; }
 	FORCEINLINE float GetMaxHealth() const { return MaxHealth; }
 	FORCEINLINE float GetHealth() const { return Health; }
+	FORCEINLINE float GetMaxShield() const { return MaxShield; }
+	FORCEINLINE float GetShield() const { return Shield; }
 	FORCEINLINE void SetHealth(float pHealth) { Health = pHealth; }
+	FORCEINLINE void SetShield(float pShield) { Shield = Shield; }
 	FORCEINLINE UCombatComponent* GetCombat() const { return Combat; }
 	FORCEINLINE bool GetDisableGameplay() const { return bDisableGameplay; }
 	FORCEINLINE UAnimMontage* GetReloadMontage() const { return ReloadMontage; }
@@ -156,6 +160,19 @@ private:
 
 	UFUNCTION()
 	void OnRep_Health(float LastHealth);
+
+	/**
+	* Player shield
+	*/
+
+	UPROPERTY(EditAnywhere, Category = "Player Stats")
+	float MaxShield = 100.f;
+
+	UPROPERTY(ReplicatedUsing = OnRep_Shield, VisibleAnywhere, Category = "Player Stats")
+	float Shield = 100.f;
+
+	UFUNCTION()
+	void OnRep_Shield(float LastShield);
 
 	/**
 	* Dissolve
