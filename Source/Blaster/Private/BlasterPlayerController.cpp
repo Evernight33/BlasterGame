@@ -73,7 +73,7 @@ void ABlasterPlayerController::SetHUDHealth(float CurrentHealth, float MaxHealth
 		BlasterHUD->CharacterOverlay->HealthText->SetText(FText::FromString(HealthText));
 	}
 }
-
+PRAGMA_DISABLE_OPTIMIZATION
 void ABlasterPlayerController::SetHUDShield(float Shield, float MaxShield)
 {
 	BlasterHUD = !BlasterHUD ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;

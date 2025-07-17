@@ -81,9 +81,7 @@ private:
 	float WarmupTime = 0.0f;
 	float CooldownTime = 0.0f;
 	uint32 CountdownInt = 0;
-	bool bIsTimerSet = false;
-	
-	
+	bool bIsTimerSet = false;	
 
 	FTimerHandle BlinkingTimer;
 
