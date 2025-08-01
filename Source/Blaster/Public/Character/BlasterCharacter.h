@@ -54,6 +54,8 @@ public:
 	void PerformKnifeStab();
 	void UpdateHUDHealth();
 	void UpdateHUDShield();
+	void UpdateHUDAmmo();
+	void SpawnDefaultWeapon();
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastEliminate();		
@@ -115,7 +117,7 @@ protected:
 	//Poll for any relevant classes and initialize our HUD
 	void PollInit();
 
-	void RotateInPlace(float DeltaTime);
+	void RotateInPlace(float DeltaTime);	
 
 	virtual void Jump() override;
 	
@@ -127,6 +129,8 @@ protected:
 	void KnifeStabButtonPressed();
 
 private:
+	bool bInitializeAmmo = false;
+
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	class USpringArmComponent* CameraBoom;
 
@@ -221,6 +225,13 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	UStaticMeshComponent* AttachedKnife;
+
+	/*
+	* Default Weapon
+	*/
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<ABaseWeapon> DefaultWeaponClass;
 
 	UFUNCTION()
 	void UpdateDissolveMaterial(float DissolveValue);

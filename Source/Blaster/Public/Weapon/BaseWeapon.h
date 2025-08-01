@@ -85,6 +85,8 @@ public:
 	UPROPERTY(EditAnywhere)
 	float ZoomInterpSpeed = 20.f;
 
+	bool bDestroyWeapon = false;
+
 protected:
 	virtual void BeginPlay() override;
 

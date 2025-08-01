@@ -38,13 +38,13 @@ public:
 	virtual void ReceivedPlayer() override; // Sync with server clock as soon as possible
 	virtual float GetServerTime(); // Sync with Server world clock
 
-	int32 ControllerGrenades = 4;
+	int32 ControllerGrenades = 4;	
 
 protected:
 	virtual void BeginPlay() override;
 
 	void SetHUDTime();
-	void PollInit();
+
 	/**
 	 * Sync time between client and server
 	 */
@@ -81,7 +81,7 @@ private:
 	float WarmupTime = 0.0f;
 	float CooldownTime = 0.0f;
 	uint32 CountdownInt = 0;
-	bool bIsTimerSet = false;	
+	bool bIsTimerSet = false;		
 
 	FTimerHandle BlinkingTimer;
 

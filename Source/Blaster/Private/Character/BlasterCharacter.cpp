@@ -192,7 +192,15 @@ void ABlasterCharacter::Eliminate()
 
 	if (Combat && Combat->EquippedWeapon)
 	{
-		Combat->EquippedWeapon->DropWeapon();
+		if (Combat->EquippedWeapon->bDestroyWeapon)
+		{
+			Combat->EquippedWeapon->Destroy();
+		}
+		else
+		{
+			Combat->EquippedWeapon->DropWeapon();
+		}
+
 		Combat->ShowAttachedKnife(false);
 	}
 }
@@ -527,6 +535,9 @@ void ABlasterCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	SpawnDefaultWeapon();
+
+	UpdateHUDAmmo();
 	UpdateHUDHealth();
 	UpdateHUDShield();
 
@@ -792,6 +803,37 @@ void ABlasterCharacter::UpdateHUDShield()
 	}
 }
 
+void ABlasterCharacter::UpdateHUDAmmo()
+{
+	BlasterPlayerController = !BlasterPlayerController ? Cast<ABlasterPlayerController>(Controller) : BlasterPlayerController;
+
+	if (BlasterPlayerController && Combat && Combat->EquippedWeapon)
+	{
+		BlasterPlayerController->SetHUDCarriedAmmo(Combat->CarryAmmo);
+		BlasterPlayerController->SetHUDWeaponAmmo(Combat->EquippedWeapon->GetAmmo());
+		bInitializeAmmo = false;
+	}
+	else
+	{
+		bInitializeAmmo = true;
+	}
+}
+
+void ABlasterCharacter::SpawnDefaultWeapon()
+{
+	ABlasterGameMode* BlasterGameMode = Cast<ABlasterGameMode>(UGameplayStatics::GetGameMode(this));
+	UWorld* World = GetWorld();
+	if (BlasterGameMode && World && !bEliminated && DefaultWeaponClass)
+	{
+		ABaseWeapon* StartingWeapon = World->SpawnActor<ABaseWeapon>(DefaultWeaponClass);
+		StartingWeapon->bDestroyWeapon = true;
+		if (Combat)
+		{
+			Combat->EquipWeapon(StartingWeapon);
+		}
+	}
+}
+
 void ABlasterCharacter::PollInit()
 {
 	if (BlasterPlayerState == nullptr)
@@ -813,6 +855,11 @@ void ABlasterCharacter::PollInit()
 				{
 					GetCombat()->SetGrenades(BlasterPlayerController->ControllerGrenades);
 					BlasterPlayerController->SetHUDGrenades(BlasterPlayerController->ControllerGrenades);
+				}
+
+				if (bInitializeAmmo)
+				{
+					UpdateHUDAmmo();
 				}
 			}			
 		}
