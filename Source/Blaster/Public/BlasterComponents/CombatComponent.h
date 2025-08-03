@@ -47,6 +47,8 @@ public:
 	
 	void JumpToShotgunEnd();
 	void ShowAttachedGrenade(bool bVisible);
+	void EquipPrimaryWeapon(ABaseWeapon* WeaponToEquip);
+	void EquipSecondaryWeapon(ABaseWeapon* WeaponToEquip);
 	void ShowAttachedKnife(bool bVisible);
 	void PickupAmmo(EWeaponType WeaponType, int32 AmmoAmount);
 
@@ -63,6 +65,9 @@ protected:
 
 	UFUNCTION()
 	void OnRep_EquippedWeapon();
+
+	UFUNCTION()
+	void OnRep_SecondaryWeapon();
 
 	UFUNCTION()
 	void OnRep_CarryAmmo();
@@ -98,9 +103,9 @@ protected:
 	void HandleReload();
 
 	void DropEquippedWeapon() const;
-	void AttachActorToHand(AActor* ActorToAttach, const FName& HandName);
+	void AttachActorToSocket(AActor* ActorToAttach, const FName& SocketName);
 	void UpdateCarryAmmo();
-	void PlayEquippedWeaponSound();
+	void PlayEquippedWeaponSound(ABaseWeapon* WeaponToEqip);
 	void ReloadEmptyWeapon();
 
 	int32 AmountToReload();
@@ -108,6 +113,9 @@ protected:
 private:
 	UPROPERTY(ReplicatedUsing = OnRep_EquippedWeapon)
 	ABaseWeapon* EquippedWeapon;
+
+	UPROPERTY(ReplicatedUsing = OnRep_SecondaryWeapon)
+	ABaseWeapon* SecondaryWeapon;
 
 	UPROPERTY()
 	ABlasterCharacter* Character;

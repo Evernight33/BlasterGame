@@ -601,14 +601,7 @@ void ABlasterCharacter::EquipButtonPressed()
 {
 	if (Combat && !bDisableGameplay)
 	{
-		if (HasAuthority())
-		{
-			Combat->EquipWeapon(OverlappingWeapon);
-		}	
-		else
-		{			
-			ServerEquipButtonPressed();
-		}
+		ServerEquipButtonPressed();
 	}
 }
 
