@@ -95,6 +95,27 @@ void UCombatComponent::EquipWeapon(ABaseWeapon* WeaponToEquip)
 	}
 }
 
+void UCombatComponent::SwapWeapons()
+{
+	if (Character == nullptr || CombatState != ECombatState::ECS_Unoccupied)
+	{
+		return;
+	}
+
+	ABaseWeapon* TempWeapon = EquippedWeapon;
+	EquippedWeapon = SecondaryWeapon;
+	SecondaryWeapon = TempWeapon;
+
+	EquippedWeapon->SetWeaponState(EWeaponState::EWS_Equipped);
+	AttachActorToSocket(EquippedWeapon, FName("RightHandSocket"));
+	EquippedWeapon->SetHUDAmmo();
+	UpdateCarryAmmo();
+	PlayEquippedWeaponSound(EquippedWeapon);
+
+	SecondaryWeapon->SetWeaponState(EWeaponState::EWS_EquippedSecondary);
+	AttachActorToSocket(SecondaryWeapon, FName("BackpackSocket"));
+}
+
 void UCombatComponent::Reload()
 {
 	if (CarryAmmo > 0 && CombatState == ECombatState::ECS_Unoccupied && EquippedWeapon && !EquippedWeapon->IsFull())
@@ -249,7 +270,7 @@ void UCombatComponent::EquipSecondaryWeapon(ABaseWeapon* WeaponToEquip)
 	}
 
 	SecondaryWeapon = WeaponToEquip;
-	SecondaryWeapon->SetWeaponState(EWeaponState::EWS_Equipped);
+	SecondaryWeapon->SetWeaponState(EWeaponState::EWS_EquippedSecondary);
 	AttachActorToSocket(WeaponToEquip, FName("BackpackSocket"));
 	PlayEquippedWeaponSound(WeaponToEquip);
 	SecondaryWeapon->SetOwner(Character);
@@ -301,6 +322,8 @@ void UCombatComponent::OnRep_EquippedWeapon()
 
 		PlayEquippedWeaponSound(EquippedWeapon);
 
+		EquippedWeapon->SetHUDAmmo();
+
 		Character->GetCharacterMovement()->bOrientRotationToMovement = false;
 		Character->bUseControllerRotationYaw = true;
 		bCanfire = true;
@@ -317,7 +340,7 @@ void UCombatComponent::OnRep_SecondaryWeapon()
 {
 	if (SecondaryWeapon && Character)
 	{
-		SecondaryWeapon->SetWeaponState(EWeaponState::EWS_Equipped);
+		SecondaryWeapon->SetWeaponState(EWeaponState::EWS_EquippedSecondary);
 
 		AttachActorToSocket(SecondaryWeapon, FName("BackpackSocket"));
 	}
@@ -727,6 +750,11 @@ void UCombatComponent::PickupAmmo(EWeaponType WeaponType, int32 AmmoAmount)
 	{
 		Reload();
 	}
+}
+
+bool UCombatComponent::CanSwapWeapons()
+{
+	return EquippedWeapon != nullptr && SecondaryWeapon != nullptr;
 }
 
 int32 UCombatComponent::AmountToReload()

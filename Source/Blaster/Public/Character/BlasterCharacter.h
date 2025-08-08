@@ -110,6 +110,7 @@ protected:
 	void AimButtonRealeased();
 	void AimOffset(float DeltaTime);
 	void SimProxiesTurn();
+	void DropOrDestroyWeapon(ABaseWeapon* Weapon);
 
 	UFUNCTION()
 	void ReceiveDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatorController, AActor* DamageCauser);

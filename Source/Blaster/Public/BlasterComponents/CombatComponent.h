@@ -36,6 +36,7 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	void EquipWeapon(ABaseWeapon* WeaponToEquip);
+	void SwapWeapons();
 	void FireButtonPressed(bool bPressed);
 	void Reload();
 	void ThrowGrenade();
@@ -51,6 +52,7 @@ public:
 	void EquipSecondaryWeapon(ABaseWeapon* WeaponToEquip);
 	void ShowAttachedKnife(bool bVisible);
 	void PickupAmmo(EWeaponType WeaponType, int32 AmmoAmount);
+	bool CanSwapWeapons();
 
 	FORCEINLINE int32 GetGrenades() const { return Grenades; }
 	FORCEINLINE void SetGrenades(int32 GrenadesAmount) { Grenades = GrenadesAmount; }

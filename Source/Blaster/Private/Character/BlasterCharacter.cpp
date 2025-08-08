@@ -190,15 +190,16 @@ void ABlasterCharacter::Eliminate()
 		&ABlasterCharacter::EliminateTimerFinished,
 		EliminateDelay);
 
-	if (Combat && Combat->EquippedWeapon)
+	if (Combat)
 	{
-		if (Combat->EquippedWeapon->bDestroyWeapon)
+		if (Combat->EquippedWeapon)
 		{
-			Combat->EquippedWeapon->Destroy();
+			DropOrDestroyWeapon(Combat->EquippedWeapon);
 		}
-		else
+
+		if (Combat->SecondaryWeapon)
 		{
-			Combat->EquippedWeapon->DropWeapon();
+			DropOrDestroyWeapon(Combat->SecondaryWeapon);
 		}
 
 		Combat->ShowAttachedKnife(false);
@@ -601,7 +602,14 @@ void ABlasterCharacter::EquipButtonPressed()
 {
 	if (Combat && !bDisableGameplay)
 	{
-		ServerEquipButtonPressed();
+		if (OverlappingWeapon)
+		{
+			ServerEquipButtonPressed();
+		}
+		else if (Combat->CanSwapWeapons())
+		{
+			Combat->SwapWeapons();
+		}		
 	}
 }
 
@@ -733,6 +741,23 @@ void ABlasterCharacter::SimProxiesTurn()
 	else
 	{
 		TurningInPlace = ETurningInPlace::ETIP_NotTurning;
+	}
+}
+
+void ABlasterCharacter::DropOrDestroyWeapon(ABaseWeapon* Weapon)
+{
+	if (Weapon == nullptr)
+	{
+		return;
+	}
+
+	if (Weapon->bDestroyWeapon)
+	{
+		Weapon->Destroy();
+	}
+	else
+	{
+		Weapon->DropWeapon();
 	}
 }
 
