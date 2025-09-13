@@ -16,6 +16,9 @@ class BLASTER_API AHitScanWeapon : public ABaseWeapon
 public:
 	virtual void Fire(const FVector& HitTarget) override;
 
+	FORCEINLINE void SetDamage(float pDamage) { Damage = pDamage; }
+	FORCEINLINE float GetDamage() { return Damage; }
+
 protected:
 	FVector TraceEndWithScatter(const FVector& TraceStart, const FVector& HitTarget);
 	void WeaponTraceHit(const FVector& TraceStart, const FVector& HitTarget, FHitResult& OutHit);

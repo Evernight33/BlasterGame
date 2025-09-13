@@ -257,7 +257,6 @@ private:
 	bool bEliminated;
 	float TurnThreshold = 0.5f;
 
-
 	UPROPERTY(Replicated)
 	bool bCanStab = false;
 

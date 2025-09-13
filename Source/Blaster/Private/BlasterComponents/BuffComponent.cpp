@@ -4,6 +4,9 @@
 #include "BlasterComponents/BuffComponent.h"
 #include "Blaster/Public/Character/BlasterCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Blaster/Public/Weapon/HitScanWeapon.h"
+#include "Blaster/Public/Weapon/ProjectileWeapon.h"
+#include "Blaster/Public/BlasterComponents/CombatComponent.h"
 
 UBuffComponent::UBuffComponent()
 {
@@ -58,6 +61,26 @@ void UBuffComponent::BuffSpeed(float BuffBaseSpeed, float BuffCrouchSpeed, float
 	}
 
 	MulticastSpeedBuff(BuffBaseSpeed, BuffCrouchSpeed);
+}
+
+void UBuffComponent::BuffDamageMultiplier(float BuffTime)
+{
+	if (Character == nullptr)
+	{
+		return;
+	}
+
+	Character->GetWorldTimerManager().SetTimer(
+		DamageMultiplierBuffTimer,
+		this,
+		&UBuffComponent::ResetDamage,
+		BuffTime
+		);
+		
+	if (Character->GetCombat())
+	{
+		Character->GetCombat()->ServerSetDamageMultiplied(true);
+	}
 }
 
 void UBuffComponent::SetInitialSpeeds(float BaseSpeed, float CrouchSpeed)
@@ -147,6 +170,16 @@ void UBuffComponent::ResetJump()
 	}
 
 	MulticastJumpBuff(InitialJumpVelocity);
+}
+
+void UBuffComponent::ResetDamage()
+{
+	if (Character == nullptr || Character->GetCombat() == nullptr)
+	{
+		return;
+	}
+
+	Character->GetCombat()->ServerSetDamageMultiplied(false);
 }
 
 void UBuffComponent::BuffJump(float BuffJumpVelocity, float BuffTime)

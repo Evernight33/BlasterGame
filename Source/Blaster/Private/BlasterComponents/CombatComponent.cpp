@@ -74,6 +74,7 @@ void UCombatComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Out
 	DOREPLIFETIME_CONDITION(UCombatComponent, CarryAmmo, COND_OwnerOnly);
 	DOREPLIFETIME(UCombatComponent, CombatState);
 	DOREPLIFETIME(UCombatComponent, Grenades);
+	DOREPLIFETIME(UCombatComponent, bDamageMultiplied);
 }
  
 void UCombatComponent::EquipWeapon(ABaseWeapon* WeaponToEquip)
@@ -755,6 +756,11 @@ void UCombatComponent::PickupAmmo(EWeaponType WeaponType, int32 AmmoAmount)
 bool UCombatComponent::CanSwapWeapons()
 {
 	return EquippedWeapon != nullptr && SecondaryWeapon != nullptr;
+}
+
+void UCombatComponent::ServerSetDamageMultiplied_Implementation(bool IsMultiplied)
+{
+	bDamageMultiplied = IsMultiplied;
 }
 
 int32 UCombatComponent::AmountToReload()

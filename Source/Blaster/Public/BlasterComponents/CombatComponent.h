@@ -21,7 +21,7 @@ class BLASTER_API UCombatComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
-public:	
+public:
 	friend class ABlasterCharacter;
 
 	UPROPERTY(EditAnywhere)
@@ -45,7 +45,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void ShotgunShellReload();
-	
+
 	void JumpToShotgunEnd();
 	void ShowAttachedGrenade(bool bVisible);
 	void EquipPrimaryWeapon(ABaseWeapon* WeaponToEquip);
@@ -54,9 +54,14 @@ public:
 	void PickupAmmo(EWeaponType WeaponType, int32 AmmoAmount);
 	bool CanSwapWeapons();
 
+	UFUNCTION(Server, Reliable)
+	void ServerSetDamageMultiplied(bool IsMultiplied);
+
 	FORCEINLINE int32 GetGrenades() const { return Grenades; }
 	FORCEINLINE void SetGrenades(int32 GrenadesAmount) { Grenades = GrenadesAmount; }
 	FORCEINLINE ABaseWeapon* GetEquippedWeapon() { return EquippedWeapon; }
+	FORCEINLINE bool GetIsDamageMultiplied() { return bDamageMultiplied; }
+	FORCEINLINE float GetDamageMultiplier(){ return DamageMultiplier; }
 
 protected:	
 	virtual void BeginPlay() override;
@@ -199,8 +204,14 @@ private:
 	UPROPERTY(EditAnywhere)
 	int32 MaxGrenades = 4;
 
+	UPROPERTY(EditAnywhere)
+	float DamageMultiplier = 1.5f;
+
 	UPROPERTY(ReplicatedUsing = OnRep_Grenades)
 	int32 Grenades;
+
+	UPROPERTY(Replicated)
+	bool bDamageMultiplied = false;
 
 	FTimerHandle FireTimer;
 

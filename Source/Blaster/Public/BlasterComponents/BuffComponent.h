@@ -20,6 +20,7 @@ public:
 	void Heal(float HealAmount, float HealingTime);
 	void ReplenishShield(float ShieldAmount, float ReplenishTime);
 	void BuffSpeed(float BuffBaseSpeed, float BuffCrouchSpeed, float BuffTime);
+	void BuffDamageMultiplier(float BuffTime);
 	void BuffJump(float BuffJumpVelocity, float BuffTime);
 	void SetInitialSpeeds(float BaseSpeed, float CrouchSpeed);
 	void SetInitialJumpVelocity(float Velocity);
@@ -75,5 +76,12 @@ private:
 	void ResetJump();	
 	float InitialJumpVelocity;
 	
+	/**
+	* Damage multiplier buff
+	*/
+
+	FTimerHandle DamageMultiplierBuffTimer;
+	void ResetDamage();
+	float DamageMultiplier;
 
 };

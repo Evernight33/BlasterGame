@@ -766,9 +766,19 @@ void ABlasterCharacter::ReceiveDamage(AActor* DamagedActor, float Damage, const 
 	if (bEliminated)
 	{
 		return;
-	}
+	}	
+
+	if (InstigatorController)
+	{
+		ABlasterCharacter* Damager = Cast<ABlasterCharacter>(InstigatorController->GetCharacter());
+		if (Damager && Damager->GetCombat() && Damager->GetCombat()->GetIsDamageMultiplied())
+		{
+			Damage *= GetCombat()->GetDamageMultiplier();
+		}
+	}	
 
 	float DamageToHealth = Damage;
+
 	if (Shield > 0)
 	{
 		if (Shield > Damage)

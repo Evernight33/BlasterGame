@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Pickups/Pickup.h"
-#include "SpeedPickup.generated.h"
+#include "DamageMultiplier.generated.h"
 
 UCLASS()
-class BLASTER_API ASpeedPickup : public APickup
+class BLASTER_API ADamageMultiplier : public APickup
 {
 	GENERATED_BODY()
-	
+
 protected:
 	virtual void OnSphereOverlap(
 		UPrimitiveComponent* OverlappedComponent,
@@ -19,16 +19,9 @@ protected:
 		int32 OtherBodyIndex,
 		bool bFromSweep,
 		const FHitResult& SweepResult
-	) override;
+	) override;	
 
 private:
-
 	UPROPERTY(EditAnywhere)
-	float BaseSpeedBuff = 1600.f;
-
-	UPROPERTY(EditAnywhere)
-	float CrouchSpeedBuff = 850.f;
-
-	UPROPERTY(EditAnywhere)
-	float SpeedBuffTime = 30.f;
+	float DamageMultiplierBuffTime = 10.f;
 };
