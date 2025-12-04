@@ -8,6 +8,8 @@
 
 class UProgressBar;
 class UTextBlock;
+class UImage;
+class UWidgetAnimation;
 
 UCLASS()
 class BLASTER_API UCharacterOverlay : public UUserWidget
@@ -49,4 +51,10 @@ public:
 
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* MatchCountDownText;
+
+	UPROPERTY(meta = (BindWidget))
+	UImage* HighPingImage;
+
+	UPROPERTY(meta = (BindWidgetAnim), Transient)
+	UWidgetAnimation* HighPingAnimation;
 };

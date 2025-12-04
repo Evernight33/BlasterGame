@@ -63,6 +63,10 @@ protected:
 	UFUNCTION(Client, Reliable)
 	void ClientJoinMidGame(FName StateOfMatch, float Warmup, float LevelStarting, float Match, float Cooldown);
 
+	void StartHighPingWarning();
+	void StopHighPingWarning();
+	void CheckPing(float DeltaTime);
+
 	void CheckTimeSync(float DeltaTime);	
 
 	float ClientServerDelta = 0.0f; // Difference between client and server time
@@ -82,6 +86,17 @@ private:
 	float CooldownTime = 0.0f;
 	uint32 CountdownInt = 0;
 	bool bIsTimerSet = false;		
+
+	float HighPingRunningTime = 0.f;
+
+	UPROPERTY(EditAnywhere)
+	float HighPingDuration = 5.f;
+
+	UPROPERTY(EditAnywhere)
+	float HighPingThreshold = 50.f;
+
+	float CheckPingFrequency = 20.f;
+	float PingAnimationRunningTime = 0.f;
 
 	FTimerHandle BlinkingTimer;
 

@@ -14,6 +14,7 @@
 #include <Kismet/GameplayStatics.h>
 #include "Blaster/Public/BlasterComponents/CombatComponent.h"
 #include "Blaster/Public/GameState/BlasterGameState.h"
+#include "Components/Image.h"
 #include "TimerManager.h"
 
 void ABlasterPlayerController::BeginPlay()
@@ -21,6 +22,7 @@ void ABlasterPlayerController::BeginPlay()
 	Super::BeginPlay();
 
 	BlasterHUD = Cast<ABlasterHUD>(GetHUD());
+
 	ServerCheckMatchState();
 }
 
@@ -37,6 +39,64 @@ void ABlasterPlayerController::Tick(float DeltaTime)
 
 	SetHUDTime();
 	CheckTimeSync(DeltaTime);
+
+	CheckPing(DeltaTime);
+}
+
+void ABlasterPlayerController::StartHighPingWarning()
+{
+	BlasterHUD = !BlasterHUD ? Cast<ABlasterHUD>(GetHUD()) : BlasterHUD;
+
+	if (BlasterHUD && BlasterHUD->CharacterOverlay
+		&& BlasterHUD->CharacterOverlay->HighPingImage
+		&& BlasterHUD->CharacterOverlay->HighPingAnimation)
+	{
+		BlasterHUD->CharacterOverlay->HighPingImage->SetVisibility(ESlateVisibility::Visible);
+		BlasterHUD->CharacterOverlay->PlayAnimation(BlasterHUD->CharacterOverlay->HighPingAnimation, 0.f, 5);
+	}
+}
+
+void ABlasterPlayerController::StopHighPingWarning()
+{
+	if (BlasterHUD && BlasterHUD->CharacterOverlay
+		&& BlasterHUD->CharacterOverlay->HighPingImage
+		&& BlasterHUD->CharacterOverlay->HighPingAnimation)
+	{
+		BlasterHUD->CharacterOverlay->HighPingImage->SetVisibility(ESlateVisibility::Hidden);
+		if (BlasterHUD->CharacterOverlay->IsAnimationPlaying(BlasterHUD->CharacterOverlay->HighPingAnimation))
+		{
+			BlasterHUD->CharacterOverlay->StopAnimation(BlasterHUD->CharacterOverlay->HighPingAnimation);
+		}		
+	}
+}
+
+void ABlasterPlayerController::CheckPing(float DeltaTime)
+{
+	HighPingRunningTime += DeltaTime;
+	if (HighPingRunningTime > CheckPingFrequency)
+	{
+		PlayerState = PlayerState == nullptr ? GetPlayerState<APlayerState>() : PlayerState;
+		if (PlayerState)
+		{
+			if (PlayerState->GetCompressedPing() * 4 > HighPingThreshold)
+			{
+				StartHighPingWarning();
+				PingAnimationRunningTime = 0.f;
+			}
+		}
+
+		HighPingRunningTime = 0.f;
+	}
+
+	if (BlasterHUD && BlasterHUD->CharacterOverlay && BlasterHUD->CharacterOverlay->HighPingAnimation
+		&& BlasterHUD->CharacterOverlay->IsAnimationPlaying(BlasterHUD->CharacterOverlay->HighPingAnimation))
+	{
+		PingAnimationRunningTime += DeltaTime;
+		if (PingAnimationRunningTime > HighPingDuration)
+		{
+			StopHighPingWarning();
+		}
+	}
 }
 
 void ABlasterPlayerController::CheckTimeSync(float DeltaTime)
