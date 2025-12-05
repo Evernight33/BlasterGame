@@ -228,6 +228,7 @@ private:
 	void StartFireTimer();
 	void FireTimerFinished();
 	void Fire();
+	void LocalFire(const FVector_NetQuantize& TraceHitTarget);
 	bool CanFire();
 	void InitializeCarryAmmo();
 	void UpdateAmmoValues();

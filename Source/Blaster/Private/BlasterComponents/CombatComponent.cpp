@@ -431,20 +431,12 @@ void UCombatComponent::ServerFire_Implementation(const FVector_NetQuantize& Trac
 
 void UCombatComponent::MulticastFire_Implementation(const FVector_NetQuantize& TraceHitTarget)
 {
-	if (Character && EquippedWeapon)
+	if (Character && Character->IsLocallyControlled() && !Character->HasAuthority())
 	{
-		if (CombatState == ECombatState::ECS_Unoccupied || 
-			(CombatState == ECombatState::ECS_Reloading && EquippedWeapon->GetWeaponType() == EWeaponType::EWT_Shotgun))
-		{
-			if (CombatState == ECombatState::ECS_Reloading)
-			{
-				CombatState = ECombatState::ECS_Unoccupied;
-			}
-
-			Character->PlayFireMontage(bAiming);
-			EquippedWeapon->Fire(TraceHitTarget);
-		}		
+		return;
 	}
+
+	LocalFire(HitTarget);
 }
 
 void UCombatComponent::TraceUnderCrosshairs(FHitResult& TraceHitResult)
@@ -755,7 +747,7 @@ void UCombatComponent::PickupAmmo(EWeaponType WeaponType, int32 AmmoAmount)
 
 bool UCombatComponent::CanSwapWeapons()
 {
-	return EquippedWeapon != nullptr && SecondaryWeapon != nullptr;
+	return EquippedWeapon != nullptr && SecondaryWeapon != nullptr && CombatState == ECombatState::ECS_Unoccupied;
 }
 
 void UCombatComponent::ServerSetDamageMultiplied_Implementation(bool IsMultiplied)
@@ -838,11 +830,29 @@ void UCombatComponent::Fire()
 	{
 		bCanfire = false;
 		ServerFire(HitTarget);
-
+		LocalFire(HitTarget);
 		if (EquippedWeapon)
 		{
 			CrosshairShootingFactor = 0.75f;
 			StartFireTimer();
+		}
+	}
+}
+
+void UCombatComponent::LocalFire(const FVector_NetQuantize& TraceHitTarget)
+{
+	if (Character && EquippedWeapon)
+	{
+		if (CombatState == ECombatState::ECS_Unoccupied ||
+			(CombatState == ECombatState::ECS_Reloading && EquippedWeapon->GetWeaponType() == EWeaponType::EWT_Shotgun))
+		{
+			if (CombatState == ECombatState::ECS_Reloading)
+			{
+				CombatState = ECombatState::ECS_Unoccupied;
+			}
+
+			Character->PlayFireMontage(bAiming);
+			EquippedWeapon->Fire(TraceHitTarget);
 		}
 	}
 }
