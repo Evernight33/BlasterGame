@@ -228,6 +228,9 @@ private:
 	void StartFireTimer();
 	void FireTimerFinished();
 	void Fire();
+	void FireProjectileWeapon();
+	void FireHitScanWeapon();
+	void FireShotgun();
 	bool CanFire();
 	void InitializeCarryAmmo();
 	void UpdateAmmoValues();

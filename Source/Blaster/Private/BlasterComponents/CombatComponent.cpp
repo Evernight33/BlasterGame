@@ -17,6 +17,7 @@
 #include "TimerManager.h"
 #include "Sound/SoundCue.h"
 #include "TimerManager.h"
+#include "Weapon/HitScanWeapon.h"
 
 UCombatComponent::UCombatComponent()
 {
@@ -837,14 +838,45 @@ void UCombatComponent::Fire()
 	if (CanFire())
 	{
 		bCanfire = false;
-		ServerFire(HitTarget);
 
 		if (EquippedWeapon)
 		{
+			switch (EquippedWeapon->FireType)
+			{
+			case EFireType::EFT_Projectile:
+				FireProjectileWeapon();
+				break;
+			case EFireType::EFT_HitScan:
+				FireHitScanWeapon();
+				break;
+			case EFireType::EFT_Shotgun:
+				FireShotgun();
+				break;
+			}
+
 			CrosshairShootingFactor = 0.75f;
 			StartFireTimer();
 		}
 	}
+}
+
+void UCombatComponent::FireProjectileWeapon()
+{
+	ServerFire(HitTarget);
+}
+
+void UCombatComponent::FireHitScanWeapon()
+{
+	if (EquippedWeapon)
+	{
+		HitTarget = EquippedWeapon->bUseScatter ? EquippedWeapon->TraceEndWithScatter(HitTarget) : HitTarget;
+		ServerFire(HitTarget);
+	}
+}
+
+void UCombatComponent::FireShotgun()
+{
+
 }
 
 bool UCombatComponent::CanFire()
