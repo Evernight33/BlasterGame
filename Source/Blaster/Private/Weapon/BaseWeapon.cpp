@@ -90,11 +90,7 @@ void ABaseWeapon::Fire(const FVector& HitTarget)
 					SocketTransform.GetRotation().Rotator());
 			}
 		}
-
-		if (HasAuthority())
-		{
-			SpendRound();
-		}		
+		SpendRound();
 	}
 }
 
