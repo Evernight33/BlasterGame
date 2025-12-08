@@ -18,6 +18,7 @@
 #include "Sound/SoundCue.h"
 #include "TimerManager.h"
 #include "Weapon/HitScanWeapon.h"
+#include "Weapon/Shotgun.h"
 
 UCombatComponent::UCombatComponent()
 {
@@ -862,7 +863,11 @@ void UCombatComponent::Fire()
 
 void UCombatComponent::FireProjectileWeapon()
 {
-	ServerFire(HitTarget);
+	if (EquippedWeapon)
+	{
+		HitTarget = EquippedWeapon->bUseScatter ? EquippedWeapon->TraceEndWithScatter(HitTarget) : HitTarget;
+		ServerFire(HitTarget);
+	}
 }
 
 void UCombatComponent::FireHitScanWeapon()
@@ -875,8 +880,13 @@ void UCombatComponent::FireHitScanWeapon()
 }
 
 void UCombatComponent::FireShotgun()
-{
-
+{	
+	AShotgun* Shotgun = Cast<AShotgun>(EquippedWeapon);
+	if (Shotgun)
+	{
+		TArray<FVector> HitTargets;
+		Shotgun->ShotgunTraceEndWithScatter(HitTarget, HitTargets);
+	}
 }
 
 bool UCombatComponent::CanFire()

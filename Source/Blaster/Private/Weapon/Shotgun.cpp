@@ -7,6 +7,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystemComponent.h"
 #include "Sound\SoundCue.h"
+#include "Kismet/KismetMathLibrary.h"
 
 void AShotgun::Fire(const FVector& HitTarget)
 {
@@ -83,5 +84,31 @@ void AShotgun::Fire(const FVector& HitTarget)
 				}
 			}
 		}
+	}
+}
+
+void AShotgun::ShotgunTraceEndWithScatter(const FVector& HitTarget, TArray<FVector>& HitTargets)
+{
+	const USkeletalMeshSocket* MuzzleFlashSocket = GetWeaponMesh()->GetSocketByName("MuzzleFlash");
+	if (MuzzleFlashSocket == nullptr)
+	{
+		return;
+	}
+
+	const FTransform SocketTransform = MuzzleFlashSocket->GetSocketTransform(GetWeaponMesh());
+	const FVector TraceStart = SocketTransform.GetLocation();
+
+	const FVector ToTargetNormalized = (HitTarget - TraceStart).GetSafeNormal();
+	const FVector SphereCenter = TraceStart + ToTargetNormalized * DistanceToSphere;
+	
+
+	for (uint32 i = 0; i < NumberOfPellets; i++)
+	{
+		const FVector RandVector = UKismetMathLibrary::RandomUnitVector() * FMath::FRandRange(0.0f, SphereRadius);
+		const FVector EndLocation = SphereCenter + RandVector;
+		FVector ToEndLocation = EndLocation - TraceStart;
+		ToEndLocation = TraceStart + ToEndLocation * TRACE_LENGTH / ToEndLocation.Size();
+
+		HitTargets.Add(ToEndLocation);
 	}
 }

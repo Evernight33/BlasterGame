@@ -106,6 +106,16 @@ public:
 	bool bDestroyWeapon = false;
 
 protected:
+	/**
+	 * Trace end with scatter
+	 */
+
+	UPROPERTY(EditAnywhere, Category = "Weapon Scatter")
+	float DistanceToSphere = 800.f;
+
+	UPROPERTY(EditAnywhere, Category = "Weapon Scatter")
+	float SphereRadius = 75.f;
+
 	virtual void BeginPlay() override;
 	virtual void OnWeaponStateSet();
 	virtual void OnEquipped();
@@ -171,16 +181,6 @@ private:
 	void OnRep_Ammo();
 
 	void SpendRound();
-
-	/**
-	 * Trace end with scatter
-	 */
-
-	UPROPERTY(EditAnywhere, Category = "Weapon Scatter")
-	float DistanceToSphere = 800.f;
-
-	UPROPERTY(EditAnywhere, Category = "Weapon Scatter")
-	float SphereRadius = 75.f;
 
 public:
 	void SetWeaponState(EWeaponState State);
