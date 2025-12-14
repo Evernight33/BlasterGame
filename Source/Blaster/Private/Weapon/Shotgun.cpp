@@ -9,9 +9,9 @@
 #include "Sound\SoundCue.h"
 #include "Kismet/KismetMathLibrary.h"
 
-void AShotgun::Fire(const FVector& HitTarget)
+void AShotgun::FireShotgun(const TArray<FVector_NetQuantize>& HitTargets)
 {
-	ABaseWeapon::Fire(HitTarget);
+	ABaseWeapon::Fire(FVector());
 
 	APawn* OwnerPawn = Cast<APawn>(GetOwner());
 	if (OwnerPawn == nullptr)
@@ -24,17 +24,17 @@ void AShotgun::Fire(const FVector& HitTarget)
 	const USkeletalMeshSocket* MuzzleFlashSocket = GetWeaponMesh()->GetSocketByName("MuzzleFlash");
 	if (MuzzleFlashSocket)
 	{
-		FTransform SocketTransform = MuzzleFlashSocket->GetSocketTransform(GetWeaponMesh());
-		FVector Start = SocketTransform.GetLocation();
+		const FTransform SocketTransform = MuzzleFlashSocket->GetSocketTransform(GetWeaponMesh());
+		const FVector Start = SocketTransform.GetLocation();
 
 		TMap<ABlasterCharacter*, uint32> HitMap;
-		for (uint32 i = 0; i < NumberOfPellets; i++)
+		for (FVector_NetQuantize HitTarget : HitTargets)
 		{
 			FHitResult FireHit;
 			WeaponTraceHit(Start, HitTarget, FireHit);
 
 			ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(FireHit.GetActor());
-			if (BlasterCharacter && HasAuthority() && InstigatorController)
+			if (BlasterCharacter)
 			{
 				if (HitMap.Contains(BlasterCharacter))
 				{
@@ -43,7 +43,7 @@ void AShotgun::Fire(const FVector& HitTarget)
 				else
 				{
 					HitMap.Emplace(BlasterCharacter, 1);
-				}		
+				}
 			}
 
 			if (ImpactParticles)
@@ -75,8 +75,8 @@ void AShotgun::Fire(const FVector& HitTarget)
 				if (HitPair.Key && HasAuthority() && InstigatorController)
 				{
 					UGameplayStatics::ApplyDamage(
-						HitPair.Key,
-						HitPair.Value * Damage,
+						HitPair.Key, // Character that was hit
+						HitPair.Value * Damage, // Number of times hit
 						InstigatorController,
 						this,
 						UDamageType::StaticClass()
@@ -87,7 +87,7 @@ void AShotgun::Fire(const FVector& HitTarget)
 	}
 }
 
-void AShotgun::ShotgunTraceEndWithScatter(const FVector& HitTarget, TArray<FVector>& HitTargets)
+void AShotgun::ShotgunTraceEndWithScatter(const FVector& HitTarget, TArray<FVector_NetQuantize>& HitTargets)
 {
 	const USkeletalMeshSocket* MuzzleFlashSocket = GetWeaponMesh()->GetSocketByName("MuzzleFlash");
 	if (MuzzleFlashSocket == nullptr)

@@ -119,6 +119,16 @@ void UCombatComponent::SwapWeapons()
 	AttachActorToSocket(SecondaryWeapon, FName("BackpackSocket"));
 }
 
+void UCombatComponent::ServerSwapWeapons_Implementation()
+{
+	MulticastSwapWeapons();
+}
+
+void UCombatComponent::MulticastSwapWeapons_Implementation()
+{
+	SwapWeapons();
+}
+
 void UCombatComponent::Reload()
 {
 	if (CarryAmmo > 0 && CombatState == ECombatState::ECS_Unoccupied && EquippedWeapon && !EquippedWeapon->IsFull())
@@ -431,6 +441,11 @@ void UCombatComponent::ServerFire_Implementation(const FVector_NetQuantize& Trac
 	MulticastFire(TraceHitTarget);
 }
 
+void UCombatComponent::ServerShotgunFire_Implementation(const TArray<FVector_NetQuantize>& TraceHitTargets)
+{
+	MulticastShotgunFire(TraceHitTargets);
+}
+
 void UCombatComponent::MulticastFire_Implementation(const FVector_NetQuantize& TraceHitTarget)
 {
 	if (Character && EquippedWeapon)
@@ -447,6 +462,15 @@ void UCombatComponent::MulticastFire_Implementation(const FVector_NetQuantize& T
 			EquippedWeapon->Fire(TraceHitTarget);
 		}		
 	}
+}
+
+void UCombatComponent::MulticastShotgunFire_Implementation(const TArray<FVector_NetQuantize>& TraceHitTargets)
+{
+	if (Character && Character->IsLocallyControlled() && !Character->HasAuthority())
+	{
+		return;
+	}
+	ShotgunLocalFire(TraceHitTargets);
 }
 
 void UCombatComponent::TraceUnderCrosshairs(FHitResult& TraceHitResult)
@@ -882,10 +906,32 @@ void UCombatComponent::FireHitScanWeapon()
 void UCombatComponent::FireShotgun()
 {	
 	AShotgun* Shotgun = Cast<AShotgun>(EquippedWeapon);
-	if (Shotgun)
+	if (Shotgun && Character)
 	{
-		TArray<FVector> HitTargets;
+		TArray<FVector_NetQuantize> HitTargets;
 		Shotgun->ShotgunTraceEndWithScatter(HitTarget, HitTargets);
+		if (!Character->HasAuthority())
+		{
+			ShotgunLocalFire(HitTargets);
+		}
+
+		ServerShotgunFire(HitTargets);
+	}
+}
+
+void UCombatComponent::ShotgunLocalFire(const TArray<FVector_NetQuantize>& TraceHitTargets)
+{
+	AShotgun* Shotgun = Cast<AShotgun>(EquippedWeapon);
+	if (Shotgun == nullptr || EquippedWeapon == nullptr || Character == nullptr)
+	{
+		return;
+	}	
+
+	if (CombatState == ECombatState::ECS_Reloading || CombatState == ECombatState::ECS_Unoccupied)
+	{
+		Character->PlayFireMontage(bAiming);
+		Shotgun->FireShotgun(TraceHitTargets);
+		CombatState = ECombatState::ECS_Unoccupied;
 	}
 }
 

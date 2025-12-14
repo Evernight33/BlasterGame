@@ -37,6 +37,13 @@ public:
 
 	void EquipWeapon(ABaseWeapon* WeaponToEquip);
 	void SwapWeapons();
+
+	UFUNCTION(Server, Reliable)
+	void ServerSwapWeapons();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastSwapWeapons();
+
 	void FireButtonPressed(bool bPressed);
 	void Reload();
 	void ThrowGrenade();
@@ -85,8 +92,14 @@ protected:
 	UFUNCTION(Server, Reliable)
 	void ServerFire(const FVector_NetQuantize& TraceHitTarget);
 
+	UFUNCTION(Server, Reliable)
+	void ServerShotgunFire(const TArray<FVector_NetQuantize>& TraceHitTargets);
+
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastFire(const FVector_NetQuantize& TraceHitTarget);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastShotgunFire(const TArray<FVector_NetQuantize>& TraceHitTargets);
 
 	void TraceUnderCrosshairs(FHitResult& TraceHitResult);
 
@@ -231,6 +244,7 @@ private:
 	void FireProjectileWeapon();
 	void FireHitScanWeapon();
 	void FireShotgun();
+	void ShotgunLocalFire(const TArray<FVector_NetQuantize>& TraceHitTargets);
 	bool CanFire();
 	void InitializeCarryAmmo();
 	void UpdateAmmoValues();

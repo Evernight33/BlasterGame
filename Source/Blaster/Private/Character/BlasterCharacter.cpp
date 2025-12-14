@@ -608,7 +608,7 @@ void ABlasterCharacter::EquipButtonPressed()
 		}
 		else if (Combat->CanSwapWeapons())
 		{
-			Combat->SwapWeapons();
+			Combat->ServerSwapWeapons();
 		}		
 	}
 }
