@@ -241,6 +241,7 @@ private:
 	void StartFireTimer();
 	void FireTimerFinished();
 	void Fire();
+	void LocalFire(const FVector_NetQuantize& TraceHitTarget);
 	void FireProjectileWeapon();
 	void FireHitScanWeapon();
 	void FireShotgun();
