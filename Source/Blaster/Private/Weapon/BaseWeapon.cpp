@@ -52,7 +52,7 @@ void ABaseWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifet
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ABaseWeapon, WeaponState);
-	DOREPLIFETIME(ABaseWeapon, Ammo);
+	//DOREPLIFETIME(ABaseWeapon, Ammo);
 }
 
 void ABaseWeapon::OnRep_Owner()
@@ -91,10 +91,7 @@ void ABaseWeapon::Fire(const FVector& HitTarget)
 					SocketTransform.GetRotation().Rotator());
 			}
 		}
-		if (HasAuthority())
-		{
-			SpendRound();
-		}	
+		SpendRound();
 	}
 }
 
@@ -116,8 +113,9 @@ void ABaseWeapon::DropWeapon()
 
 void ABaseWeapon::AddAmmo(int32 AmmoToAdd)
 {
-	Ammo = FMath::Clamp(Ammo - AmmoToAdd, 0, MagCapacity);
+	Ammo = FMath::Clamp(Ammo + AmmoToAdd, 0, MagCapacity);
 	SetHUDAmmo();
+	ClientAddAmmo(AmmoToAdd);
 }
 
 void ABaseWeapon::EnableCustomDepth(bool bEnable)
@@ -155,6 +153,30 @@ FVector ABaseWeapon::TraceEndWithScatter(const FVector& HitTarget)
 	);*/
 
 	return FVector(TraceStart + ToEndLocation * TRACE_LENGTH / ToEndLocation.Size());
+}
+
+void ABaseWeapon::ClientUpdateAmmo_Implementation(int32 ServerAmmo)
+{
+	if (HasAuthority())
+	{
+		return;
+	}
+
+	Ammo = ServerAmmo;
+	--Sequence;
+	Ammo -= Sequence;
+	SetHUDAmmo();
+}
+
+void ABaseWeapon::ClientAddAmmo_Implementation(int32 AmmoToAdd)
+{
+	Ammo = FMath::Clamp(Ammo + AmmoToAdd, 0, MagCapacity);
+	BlasterOwnerCharacter = BlasterOwnerCharacter == nullptr ? Cast<ABlasterCharacter>(GetOwner()) : BlasterOwnerCharacter;
+	if (BlasterOwnerCharacter && BlasterOwnerCharacter->GetCombat() && IsFull())
+	{
+		BlasterOwnerCharacter->GetCombat()->JumpToShotgunEnd();
+	}
+	SetHUDAmmo();
 }
 
 void ABaseWeapon::ShowPickupWidget(bool bShowWidget)
@@ -301,21 +323,30 @@ void ABaseWeapon::OnRep_WeaponState()
 	}
 }
 
-void ABaseWeapon::OnRep_Ammo()
-{
-	BlasterOwnerCharacter = BlasterOwnerCharacter ? Cast<ABlasterCharacter>(GetOwner()) : BlasterOwnerCharacter;
-	if (BlasterOwnerCharacter && BlasterOwnerCharacter->GetCombat() && IsFull())
-	{
-		BlasterOwnerCharacter->GetCombat()->JumpToShotgunEnd();
-	}
-
-	SetHUDAmmo();
-}
+//void ABaseWeapon::OnRep_Ammo()
+//{
+//	BlasterOwnerCharacter = BlasterOwnerCharacter ? Cast<ABlasterCharacter>(GetOwner()) : BlasterOwnerCharacter;
+//	if (BlasterOwnerCharacter && BlasterOwnerCharacter->GetCombat() && IsFull())
+//	{
+//		BlasterOwnerCharacter->GetCombat()->JumpToShotgunEnd();
+//	}
+//
+//	SetHUDAmmo();
+//}
 
 void ABaseWeapon::SpendRound()
 {
 	Ammo = FMath::Clamp(Ammo - 1, 0, MagCapacity);
 	SetHUDAmmo();
+
+	if (HasAuthority())
+	{
+		ClientUpdateAmmo(Ammo);
+	}
+	else
+	{
+		Sequence++;
+	}
 }
 
 void ABaseWeapon::SetWeaponState(EWeaponState State)

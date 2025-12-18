@@ -55,6 +55,13 @@ public:
 	void EnableCustomDepth(bool bEnable);
 	FVector TraceEndWithScatter(const FVector& HitTarget);
 
+	UFUNCTION(Client, Reliable)
+	void ClientUpdateAmmo(int32 ServerAmmo);
+
+	UFUNCTION(Client, Reliable)
+	void ClientAddAmmo(int32 AmmoToAdd);
+
+
 	/*
 	* Textures for the weapon crosshairs
 	*/
@@ -159,11 +166,15 @@ private:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<ABulletShell> BulletShell;
 
-	UPROPERTY(EditAnywhere, ReplicatedUsing = OnRep_Ammo)
+	UPROPERTY(EditAnywhere)
 	int32 Ammo;
 
 	UPROPERTY(EditAnywhere)
 	int32 MagCapacity;
+
+	// The number of unprocessed server request for ammo.
+	// Incremented in spend round, decremented in ClientUpdateAmmo.
+	int32 Sequence = 0;
 
 	UPROPERTY(EditAnywhere)
 	EWeaponType WeaponType;
@@ -176,9 +187,6 @@ private:
 
 	UFUNCTION()
 	void OnRep_WeaponState();
-
-	UFUNCTION()
-	void OnRep_Ammo();
 
 	void SpendRound();
 
