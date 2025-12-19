@@ -89,6 +89,9 @@ protected:
 	UFUNCTION()
 	void OnRep_CombatState();
 
+	UFUNCTION()
+	void OnRep_Aiming();
+
 	UFUNCTION(Server, Reliable)
 	void ServerFire(const FVector_NetQuantize& TraceHitTarget);
 
@@ -146,7 +149,7 @@ private:
 	UPROPERTY()
 	ABlasterHUD* HUD;
 
-	UPROPERTY(Replicated)
+	UPROPERTY(ReplicatedUsing = OnRep_Aiming)
 	bool bAiming;
 
 	UPROPERTY(EditAnywhere)
@@ -162,6 +165,8 @@ private:
 	ECombatState CombatState = ECombatState::ECS_Unoccupied;
 
 	bool bFireButtonPressed;
+
+	bool bAimButtonPressed = false;
 
 	FTimerHandle EquipTimer;
 
