@@ -131,9 +131,11 @@ void UCombatComponent::MulticastSwapWeapons_Implementation()
 
 void UCombatComponent::Reload()
 {
-	if (CarryAmmo > 0 && CombatState == ECombatState::ECS_Unoccupied && EquippedWeapon && !EquippedWeapon->IsFull())
+	if (CarryAmmo > 0 && CombatState == ECombatState::ECS_Unoccupied && EquippedWeapon && !EquippedWeapon->IsFull() && !bLocallyReloading)
 	{
 		ServerReload();
+		HandleReload();
+		bLocallyReloading = true;
 	}
 }
 
@@ -389,7 +391,10 @@ void UCombatComponent::OnRep_CombatState()
 	switch (CombatState)
 	{
 		case ECombatState::ECS_Reloading:
-			HandleReload();
+			if (Character && !Character->IsLocallyControlled())
+			{
+				HandleReload();
+			}			
 			break;
 		case ECombatState::ECS_Unoccupied:
 			AttachActorToSocket(EquippedWeapon, FName("RightHandSocket"));
@@ -614,7 +619,10 @@ void UCombatComponent::ServerReload_Implementation()
 
 	CombatState = ECombatState::ECS_Reloading;
 
-	HandleReload();
+	if (!Character->IsLocallyControlled())
+	{
+		HandleReload();
+	}
 }
 
 void UCombatComponent::ServerThrowGrenade_Implementation(const FVector_NetQuantize& Target)
@@ -665,6 +673,8 @@ void UCombatComponent::ServerKnifeStab_Implementation()
 
 void UCombatComponent::FinishReloading()
 {
+	bLocallyReloading = false;
+
 	if (Character != nullptr && Character->HasAuthority())
 	{
 		CombatState = ECombatState::ECS_Unoccupied;
@@ -699,7 +709,10 @@ void UCombatComponent::KnifeStabFinished()
 
 void UCombatComponent::HandleReload()
 {
-	Character->PlayReloadMontage();
+	if (Character)
+	{
+		Character->PlayReloadMontage();
+	}	
 }
 
 void UCombatComponent::DropEquippedWeapon() const
@@ -959,7 +972,7 @@ bool UCombatComponent::CanFire()
 {
 	if (EquippedWeapon != nullptr)
 	{
-		return !EquippedWeapon->IsEmpty() &&  
+		return !bLocallyReloading && !EquippedWeapon->IsEmpty() &&  
 			(CombatState == ECombatState::ECS_Unoccupied && bCanfire || 
 		    (CombatState == ECombatState::ECS_Reloading && EquippedWeapon->GetWeaponType() == EWeaponType::EWT_Shotgun));
 	}

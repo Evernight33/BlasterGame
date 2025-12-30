@@ -87,6 +87,7 @@ public:
 	FORCEINLINE UBuffComponent* GetBuff() const { return Buff; }
 
 	ECombatState GetCombatState() const;
+	bool IsLocallyReloading();
 
 	ABaseWeapon* GetEquippedWeapon();
 	FVector GetHitTarget() const;
