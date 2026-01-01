@@ -22,6 +22,7 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "Blaster/Public/PlayerState/BlasterPlayerState.h"
 #include "Blaster/Public/Weapon/WeaponTypes.h"
+#include "Components/BoxComponent.h"
 
 ABlasterCharacter::ABlasterCharacter()
 {
@@ -87,6 +88,78 @@ ABlasterCharacter::ABlasterCharacter()
 	AttachedKnife->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	AttachedKnife->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 	//AttachedKnife->OnComponentBeginOverlap.AddDynamic(this, &ABlasterCharacter::OnKnifeStabbed);
+
+	Head = CreateDefaultSubobject<UBoxComponent>(TEXT("head"));
+	Head->SetupAttachment(GetMesh(), FName("head"));
+	Head->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	Pelvis = CreateDefaultSubobject<UBoxComponent>(TEXT("pelvis"));
+	Pelvis->SetupAttachment(GetMesh(), FName("pelvis"));
+	Pelvis->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	Spine_02 = CreateDefaultSubobject<UBoxComponent>(TEXT("spine_02"));
+	Spine_02->SetupAttachment(GetMesh(), FName("spine_02"));
+	Spine_02->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	Spine_03 = CreateDefaultSubobject<UBoxComponent>(TEXT("spine_03"));
+	Spine_03->SetupAttachment(GetMesh(), FName("spine_03"));
+	Spine_03->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	UpperArm_L = CreateDefaultSubobject<UBoxComponent>(TEXT("upperarm_l"));
+	UpperArm_L->SetupAttachment(GetMesh(), FName("upperarm_l"));
+	UpperArm_L->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	UpperArm_R = CreateDefaultSubobject<UBoxComponent>(TEXT("upperarm_r"));
+	UpperArm_R->SetupAttachment(GetMesh(), FName("upperarm_r"));
+	UpperArm_R->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	LowerArm_L = CreateDefaultSubobject<UBoxComponent>(TEXT("lowerarm_l"));
+	LowerArm_L->SetupAttachment(GetMesh(), FName("lowerarm_l"));
+	LowerArm_L->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	LowerArm_R = CreateDefaultSubobject<UBoxComponent>(TEXT("lowerarm_r"));
+	LowerArm_R->SetupAttachment(GetMesh(), FName("lowerarm_r"));
+	LowerArm_R->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	Hand_L = CreateDefaultSubobject<UBoxComponent>(TEXT("hand_l"));
+	Hand_L->SetupAttachment(GetMesh(), FName("hand_l"));
+	Hand_L->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	Hand_R = CreateDefaultSubobject<UBoxComponent>(TEXT("hand_r"));
+	Hand_R->SetupAttachment(GetMesh(), FName("hand_r"));
+	Hand_R->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	Backpack = CreateDefaultSubobject<UBoxComponent>(TEXT("backpack"));
+	Backpack->SetupAttachment(GetMesh(), FName("backpack"));
+	Backpack->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	Blanket = CreateDefaultSubobject<UBoxComponent>(TEXT("blanket"));
+	Blanket->SetupAttachment(GetMesh(), FName("backpack"));
+	Blanket->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	Thigh_L = CreateDefaultSubobject<UBoxComponent>(TEXT("thigh_l"));
+	Thigh_L->SetupAttachment(GetMesh(), FName("thigh_l"));
+	Thigh_L->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	Thigh_R = CreateDefaultSubobject<UBoxComponent>(TEXT("thigh_r"));
+	Thigh_R->SetupAttachment(GetMesh(), FName("thigh_r"));
+	Thigh_R->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	Calf_L = CreateDefaultSubobject<UBoxComponent>(TEXT("calf_l"));
+	Calf_L->SetupAttachment(GetMesh(), FName("calf_l"));
+	Calf_L->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	Calf_R = CreateDefaultSubobject<UBoxComponent>(TEXT("calf_r"));
+	Calf_R->SetupAttachment(GetMesh(), FName("calf_r"));
+	Calf_R->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	Foot_R = CreateDefaultSubobject<UBoxComponent>(TEXT("foot_r"));
+	Foot_R->SetupAttachment(GetMesh(), FName("foot_r"));
+	Foot_R->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	Foot_L = CreateDefaultSubobject<UBoxComponent>(TEXT("foot_l"));
+	Foot_L->SetupAttachment(GetMesh(), FName("foot_l"));
+	Foot_L->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void ABlasterCharacter::Tick(float DeltaTime)

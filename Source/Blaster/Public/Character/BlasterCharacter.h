@@ -23,6 +23,7 @@ class USoundCue;
 class ABlasterPlayerState;
 class UCombatComponent;
 class UBuffComponent;
+class UBoxComponent;
 
 UCLASS()
 class BLASTER_API ABlasterCharacter : public ACharacter, public IInteractWithCrosshairsInterface
@@ -120,7 +121,6 @@ protected:
 	void PollInit();
 
 	void RotateInPlace(float DeltaTime);	
-
 	virtual void Jump() override;
 	
 	void FireButtonPressed();
@@ -129,6 +129,64 @@ protected:
 	void ReloadButtonPressed();
 	void GrenadeButtonPressed();
 	void KnifeStabButtonPressed();
+
+	/*
+	* Hit boxes used for server-side rewind
+	*/
+
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* Head;
+
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* Pelvis;
+
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* Spine_02;
+
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* Spine_03;
+
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* UpperArm_L;
+
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* UpperArm_R;
+
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* LowerArm_L;
+
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* LowerArm_R;
+
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* Hand_L;
+
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* Hand_R;
+
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* Backpack;
+
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* Blanket;
+
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* Thigh_L;
+
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* Thigh_R;
+
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* Calf_L;
+
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* Calf_R;
+
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* Foot_R;
+
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* Foot_L;
 
 private:
 	bool bInitializeAmmo = false;
