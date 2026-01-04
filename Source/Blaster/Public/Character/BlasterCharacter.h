@@ -24,6 +24,7 @@ class ABlasterPlayerState;
 class UCombatComponent;
 class UBuffComponent;
 class UBoxComponent;
+class ULagCompensationComponent;
 
 UCLASS()
 class BLASTER_API ABlasterCharacter : public ACharacter, public IInteractWithCrosshairsInterface
@@ -99,6 +100,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void ShowSniperScopeWidget(bool bShowScope);
 
+	UPROPERTY()
+	TMap<FName, UBoxComponent*> HitCollisionBoxes;
+	
 protected:
 	virtual void BeginPlay() override;
 
@@ -203,11 +207,18 @@ private:
 	UPROPERTY(ReplicatedUsing = OnRep_OverlappingWeapon)
 	ABaseWeapon* OverlappingWeapon;
 
+	/*
+	* Blaster Components
+	*/
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UCombatComponent* Combat;
 
 	UPROPERTY(VisibleAnywhere)
 	UBuffComponent* Buff;
+
+	UPROPERTY(VisibleAnywhere)
+	ULagCompensationComponent* LagCompensation;
 
 	void CalculateAO_Pitch();
 	float CalculateSpeed();
