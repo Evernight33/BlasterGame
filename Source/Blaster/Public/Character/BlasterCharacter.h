@@ -87,6 +87,7 @@ public:
 	FORCEINLINE UStaticMeshComponent* GetAttachedKnife() const { return AttachedKnife; }
 	FORCEINLINE void SetCanKnifeStab(bool pCanKnifeSTab) { bCanStab = pCanKnifeSTab; }
 	FORCEINLINE UBuffComponent* GetBuff() const { return Buff; }
+	FORCEINLINE ULagCompensationComponent* GetLagCompensation() const { return LagCompensation; }
 
 	ECombatState GetCombatState() const;
 	bool IsLocallyReloading();
