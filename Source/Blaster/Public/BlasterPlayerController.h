@@ -39,6 +39,7 @@ public:
 	virtual float GetServerTime(); // Sync with Server world clock
 
 	int32 ControllerGrenades = 4;	
+	float SingleTripTime = 0.f;
 
 protected:
 	virtual void BeginPlay() override;

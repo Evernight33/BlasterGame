@@ -8,6 +8,7 @@
 
 class ABlasterPlayerController;
 class ABlasterCharacter;
+class ABaseWeapon;
 
 USTRUCT(BlueprintType)
 struct FBoxInformation
@@ -60,8 +61,15 @@ public:
 	void ShowFramePackage(const FFramePackage& Package, const FColor& Color);
 	FServerSideRewindResult ServerSideRewind(ABlasterCharacter* HitCharacter,
 		const FVector_NetQuantize& TraceStart, 
-		const FVector_NetQuantize& HitLocationm, 
+		const FVector_NetQuantize& HitLocation, 
 		float HitTime);
+
+	UFUNCTION(Server, Reliable)
+	void ServerScoreRequest(ABlasterCharacter* HitCharacter,
+		const FVector_NetQuantize& TraceStart,
+		const FVector_NetQuantize& HitLocation,
+		float HitTime,
+		ABaseWeapon* DamageCauser);
 
 protected:
 	virtual void BeginPlay() override;
@@ -76,6 +84,7 @@ protected:
 	void MoveBoxes(ABlasterCharacter* HitCharacter, const FFramePackage& Package);
 	void ResetHitBoxes(ABlasterCharacter* HitCharacter, const FFramePackage& Package);
 	void EnableCharacterMeshCollision(ABlasterCharacter* HitCharacter, ECollisionEnabled::Type CollisionEnabled);
+	void SaveFramePackage();
 
 private:
 	UPROPERTY()
