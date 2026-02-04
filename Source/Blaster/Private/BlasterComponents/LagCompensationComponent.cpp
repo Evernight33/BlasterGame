@@ -29,6 +29,7 @@ void ULagCompensationComponent::SaveFramePackage(FFramePackage& Package)
 	if (Character)
 	{
 		Package.Time = GetWorld()->GetTimeSeconds();
+		Package.Character = Character;
 		for (auto& BoxPair : Character->HitCollisionBoxes)
 		{
 			FBoxInformation BoxInformation;
@@ -38,6 +39,92 @@ void ULagCompensationComponent::SaveFramePackage(FFramePackage& Package)
 			Package.HitBoxInfo.Add(BoxPair.Key, BoxInformation);
 		}
 	}
+}
+
+FFramePackage ULagCompensationComponent::GetFrameToCheck(ABlasterCharacter* HitCharacter, float HitTime)
+{
+	if (!HitCharacter || !HitCharacter->GetLagCompensation() ||
+		!HitCharacter->GetLagCompensation()->FrameHistory.GetHead() ||
+		!HitCharacter->GetLagCompensation()->FrameHistory.GetTail())
+	{
+		return FFramePackage();
+	}
+
+	// Frame package to check to verify a hit
+	FFramePackage FrameToCheck;
+	bool bShouldInterpolate = true;
+	// Frame history of the character that was hit
+	const TDoubleLinkedList<FFramePackage>& History = HitCharacter->GetLagCompensation()->FrameHistory;
+	const float OldestHistoryTime = History.GetTail()->GetValue().Time;
+	const float NewestHistoryTime = History.GetHead()->GetValue().Time;
+
+	if (OldestHistoryTime > HitTime)
+	{
+		// Too laggy to do SSR
+		return FFramePackage();
+	}
+	if (OldestHistoryTime == HitTime)
+	{
+		FrameToCheck = History.GetTail()->GetValue();
+		bShouldInterpolate = false;
+	}
+	if (NewestHistoryTime <= HitTime)
+	{
+		FrameToCheck = History.GetHead()->GetValue();
+		bShouldInterpolate = false;
+	}
+
+	TDoubleLinkedList<FFramePackage>::TDoubleLinkedListNode* Younger = History.GetHead();
+	TDoubleLinkedList<FFramePackage>::TDoubleLinkedListNode* Older = Younger;
+	while (Older->GetValue().Time > HitTime) // is older still younger that HitTime
+	{
+		// March back until: OlderTime < HitTime < YoungerTime
+		if (Older->GetNextNode() == nullptr)
+		{
+			break;
+		}
+		Older = Older->GetNextNode();
+		if (Older->GetValue().Time > HitTime)
+		{
+			Younger = Older;
+		}
+	}
+
+	if (Older->GetValue().Time == HitTime)
+	{
+		FrameToCheck = Older->GetValue();
+		bShouldInterpolate = false;
+	}
+
+	if (bShouldInterpolate)
+	{
+		FrameToCheck = InterpBetweenFrames(Older->GetValue(), Younger->GetValue(), HitTime);
+	}
+
+	return FrameToCheck;
+}
+
+FShotgunServerSideRewindResult ULagCompensationComponent::ShotgunServerSideRewind(const TArray<ABlasterCharacter*>& HitCharacters,
+	const FVector_NetQuantize& TraceStart,
+	const TArray<FVector_NetQuantize>& HitLocations,
+	float HitTime)
+{
+	TArray<FFramePackage> FramesToCheck;
+
+	for (ABlasterCharacter* HitCharacter : HitCharacters)
+	{
+		FramesToCheck.Add(GetFrameToCheck(HitCharacter, HitTime));
+	}
+
+	return FShotgunServerSideRewindResult();
+}
+
+FShotgunServerSideRewindResult ULagCompensationComponent::ShotgunConfirmHit(
+	const TArray<FFramePackage>& FramePackages,
+	const FVector_NetQuantize& TraceStart,
+	const TArray<FVector_NetQuantize>& HitLocations)
+{
+	return FShotgunServerSideRewindResult();
 }
 
 FFramePackage ULagCompensationComponent::InterpBetweenFrames(const FFramePackage& OlderFrame, const FFramePackage& YoungerFrame, float HitTime)
@@ -254,64 +341,7 @@ FServerSideRewindResult ULagCompensationComponent::ServerSideRewind(ABlasterChar
 	const FVector_NetQuantize& HitLocation,
 	float HitTime)
 {
-	if (!HitCharacter || !Character->GetLagCompensation() || 
-		!Character->GetLagCompensation()->FrameHistory.GetHead() ||
-		!Character->GetLagCompensation()->FrameHistory.GetTail())
-	{
-		return FServerSideRewindResult();
-	}
-
-	// Frame package to check to verify a hit
-	FFramePackage FrameToCheck;
-	bool bShouldInterpolate = true;
-	// Frame history of the character that was hit
-	const TDoubleLinkedList<FFramePackage>& History = HitCharacter->GetLagCompensation()->FrameHistory;
-	const float OldestHistoryTime = History.GetTail()->GetValue().Time;
-	const float NewestHistoryTime = History.GetHead()->GetValue().Time;
-
-	if (OldestHistoryTime > HitTime)
-	{
-		// Too laggy to do SSR
-		return FServerSideRewindResult();
-	}
-	if (OldestHistoryTime == HitTime)
-	{
-		FrameToCheck = History.GetTail()->GetValue();
-		bShouldInterpolate = false;
-	}
-	if (NewestHistoryTime <= HitTime)
-	{
-		FrameToCheck = History.GetHead()->GetValue();
-		bShouldInterpolate = false;
-	}
-
-	TDoubleLinkedList<FFramePackage>::TDoubleLinkedListNode* Younger = History.GetHead();
-	TDoubleLinkedList<FFramePackage>::TDoubleLinkedListNode* Older = Younger;
-	while (Older->GetValue().Time > HitTime) // is older still younger that HitTime
-	{
-		// March back until: OlderTime < HitTime < YoungerTime
-		if (Older->GetNextNode() == nullptr)
-		{
-			break;
-		}
-		Older = Older->GetNextNode();
-		if (Older->GetValue().Time > HitTime)
-		{
-			Younger = Older;
-		}
-	}
-
-	if (Older->GetValue().Time == HitTime)
-	{
-		FrameToCheck = Older->GetValue();
-		bShouldInterpolate = false;
-	}
-
-	if (bShouldInterpolate)
-	{
-		FrameToCheck = InterpBetweenFrames(Older->GetValue(), Younger->GetValue(), HitTime);
-	}
-
+	FFramePackage FrameToCheck = GetFrameToCheck(HitCharacter, HitTime);
 	return ConfirmHit(FrameToCheck, HitCharacter, TraceStart, HitLocation);
 }
 
