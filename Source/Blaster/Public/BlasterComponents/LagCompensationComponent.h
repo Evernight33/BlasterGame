@@ -87,6 +87,13 @@ public:
 		float HitTime,
 		ABaseWeapon* DamageCauser);
 
+	UFUNCTION(Server, Reliable)
+	void ShotgunServerScoreRequest(
+		const TArray<ABlasterCharacter*>& HitCharacters, 
+		const FVector_NetQuantize& TraceStart,
+		const TArray<FVector_NetQuantize>& HitLocations,
+		float HitTime);
+
 protected:
 	virtual void BeginPlay() override;
 	void SaveFramePackage(FFramePackage& Package);
@@ -113,9 +120,9 @@ protected:
 		float HitTime);
 
 	FShotgunServerSideRewindResult ShotgunConfirmHit(
-	const TArray<FFramePackage>& FramePackages,
-	const FVector_NetQuantize& TraceStart,
-	const TArray<FVector_NetQuantize>& HitLocations);
+		const TArray<FFramePackage>& FramePackages,
+		const FVector_NetQuantize& TraceStart,
+		const TArray<FVector_NetQuantize>& HitLocations);
 
 private:
 	UPROPERTY()
