@@ -14,6 +14,7 @@ class BLASTER_API AProjectileBullet : public AProjectile
 public:
 	AProjectileBullet();
 
+	virtual void PostEditChangeProperty()
 	/*
 	* Used with server side rewind
 	*/
