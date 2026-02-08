@@ -6,6 +6,7 @@
 #include "Weapon/Projectile.h"
 #include "ProjectileBullet.generated.h"
 
+struct FPropertyChangedEvent;
 UCLASS()
 class BLASTER_API AProjectileBullet : public AProjectile
 {
@@ -13,18 +14,10 @@ class BLASTER_API AProjectileBullet : public AProjectile
 
 public:
 	AProjectileBullet();
-
-	virtual void PostEditChangeProperty()
-	/*
-	* Used with server side rewind
-	*/
-
-	bool bUseServerSideRewind = false;
-	FVector_NetQuantize TraceStart;
-	FVector_NetQuantize100 InitialVelocity;
-
-	UPROPERTY(EditAnywhere)
-	float InitialSpeed = 15000.f;
+	
+#if WITH_EDITOR
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& Event) override;
+#endif
 
 protected:
 	virtual void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit) override;
