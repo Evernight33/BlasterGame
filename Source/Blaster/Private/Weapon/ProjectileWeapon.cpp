@@ -55,7 +55,7 @@ void AProjectileWeapon::Fire(const FVector& HitTarget)
 									ProjectileSpawnLocation,
 									TargetRotation,
 									SpawnParams);
-							SpawnedProjectile->bUseServerSideRewind = false;
+							SpawnedProjectile->bUseServerSideRewind = true;
 						}
 					}
 					else // client, using SSR

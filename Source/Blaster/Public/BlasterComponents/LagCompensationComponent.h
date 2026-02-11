@@ -95,6 +95,12 @@ public:
 		const TArray<FVector_NetQuantize>& HitLocations,
 		float HitTime);
 
+	UFUNCTION(Server, Reliable)
+	void ProjectileServerScoreRequest(ABlasterCharacter* HitCharacter,
+		const FVector_NetQuantize& TraceStart,
+		const FVector_NetQuantize100& InitialVelocity,
+		float HitTime);
+
 	FServerSideRewindResult ProjectileServerSideRewind(ABlasterCharacter* HitCharacter,
 		const FVector_NetQuantize& TraceStart,
 		const FVector_NetQuantize100& InitialVelocity,
