@@ -82,6 +82,12 @@ void ABlasterPlayerController::CheckPing(float DeltaTime)
 			{
 				StartHighPingWarning();
 				PingAnimationRunningTime = 0.f;
+
+				ServerReportPingStatus(true);
+			}
+			else
+			{
+				ServerReportPingStatus(false);
 			}
 		}
 
@@ -522,6 +528,12 @@ void ABlasterPlayerController::OnRep_MatchState()
 	{
 		HandleCooldown();
 	}
+}
+
+
+void ABlasterPlayerController::ServerReportPingStatus_Implementation(bool bHighPing)
+{
+	HighPingDelegate.Broadcast(bHighPing);
 }
 
 void ABlasterPlayerController::TextBlinking()
