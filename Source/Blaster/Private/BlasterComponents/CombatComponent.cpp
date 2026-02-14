@@ -105,23 +105,22 @@ void UCombatComponent::SwapWeapons()
 		return;
 	}
 
+	Character->bFinishedSwapping = false;
 	ABaseWeapon* TempWeapon = EquippedWeapon;
 	EquippedWeapon = SecondaryWeapon;
 	SecondaryWeapon = TempWeapon;
-
-	EquippedWeapon->SetWeaponState(EWeaponState::EWS_Equipped);
-	AttachActorToSocket(EquippedWeapon, FName("RightHandSocket"));
-	EquippedWeapon->SetHUDAmmo();
-	UpdateCarryAmmo();
-	PlayEquippedWeaponSound(EquippedWeapon);
-
-	SecondaryWeapon->SetWeaponState(EWeaponState::EWS_EquippedSecondary);
-	AttachActorToSocket(SecondaryWeapon, FName("BackpackSocket"));
 }
 
 void UCombatComponent::ServerSwapWeapons_Implementation()
 {
+	if (Character && !Character->IsLocallyControlled())
+	{
+		Character->PlaySwapMontage();
+	}
+
 	MulticastSwapWeapons();
+
+	CombatState = ECombatState::ECS_SwappingWeapons;
 }
 
 void UCombatComponent::MulticastSwapWeapons_Implementation()
@@ -420,9 +419,16 @@ void UCombatComponent::OnRep_CombatState()
 				ShowAttachedGrenade(true);
 				Character->PlayThrowGrenadeMontage();
 			}
+			break;
 		case ECombatState::ECS_KnifeStabbing:
 			ShowAttachedKnife(true);
 			Character->PlayKnifeStabMontage();
+			break;
+		case ECombatState::ECS_SwappingWeapons:
+			if (Character && !Character->IsLocallyControlled())
+			{
+				Character->PlaySwapMontage();
+			}
 			break;
 	}
 }
@@ -684,6 +690,31 @@ void UCombatComponent::FinishReloading()
 	if (bFireButtonPressed)
 	{
 		Fire();
+	}
+}
+
+void UCombatComponent::FinishSwapAttachWeapons()
+{
+	EquippedWeapon->SetWeaponState(EWeaponState::EWS_Equipped);
+	AttachActorToSocket(EquippedWeapon, FName("RightHandSocket"));
+	EquippedWeapon->SetHUDAmmo();
+	UpdateCarryAmmo();
+	PlayEquippedWeaponSound(EquippedWeapon);
+
+	SecondaryWeapon->SetWeaponState(EWeaponState::EWS_EquippedSecondary);
+	AttachActorToSocket(SecondaryWeapon, FName("BackpackSocket"));
+}
+
+void UCombatComponent::FinishSwap()
+{
+	if (Character && Character->HasAuthority())
+	{
+		CombatState = ECombatState::ECS_Unoccupied;
+	}
+
+	if (Character)
+	{
+		Character->bFinishedSwapping = true;
 	}
 }
 
@@ -972,9 +1003,17 @@ bool UCombatComponent::CanFire()
 {
 	if (EquippedWeapon != nullptr)
 	{
-		return !bLocallyReloading && !EquippedWeapon->IsEmpty() &&  
-			(CombatState == ECombatState::ECS_Unoccupied && bCanfire || 
-		    (CombatState == ECombatState::ECS_Reloading && EquippedWeapon->GetWeaponType() == EWeaponType::EWT_Shotgun));
+		if (!EquippedWeapon->IsEmpty() &&
+			(CombatState == ECombatState::ECS_Unoccupied && bCanfire ||
+				(CombatState == ECombatState::ECS_Reloading && EquippedWeapon->GetWeaponType() == EWeaponType::EWT_Shotgun)))
+		{
+			return true;
+		}
+
+		if (bLocallyReloading)
+		{
+			return false;
+		}
 	}
 
 	return false;

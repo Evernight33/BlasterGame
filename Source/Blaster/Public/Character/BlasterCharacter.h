@@ -46,6 +46,11 @@ public:
 	virtual void OnRep_ReplicatedMovement() override;
 	virtual void Destroyed() override;
 
+	/*
+	* Play Montages
+	*/
+
+	void PlaySwapMontage();
 	void PlayFireMontage(bool bAiming);
 	void PlayReloadMontage();
 	void SetOverlappingWeapon(ABaseWeapon* Weapon);
@@ -103,6 +108,8 @@ public:
 
 	UPROPERTY()
 	TMap<FName, UBoxComponent*> HitCollisionBoxes;
+
+	bool bFinishedSwapping = false;
 	
 protected:
 	virtual void BeginPlay() override;
@@ -372,4 +379,7 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = Combat)
 	UAnimMontage* KnifeStabMontage;
+
+	UPROPERTY(EditAnywhere, Category = Combat)
+	UAnimMontage* SwapMontage;
 };
