@@ -451,7 +451,7 @@ void UCombatComponent::FireButtonPressed(bool bPressed)
 	}
 }
 
-void UCombatComponent::ServerFire_Implementation(const FVector_NetQuantize& TraceHitTarget)
+void UCombatComponent::ServerFire_Implementation(const FVector_NetQuantize& TraceHitTarget, float FireDelay)
 {
 	if (EquippedWeapon->GetWeaponType() == EWeaponType::EWT_Pistol || EquippedWeapon->GetWeaponType() == EWeaponType::EWT_SubmachineGun)
 	{
@@ -465,9 +465,31 @@ void UCombatComponent::ServerFire_Implementation(const FVector_NetQuantize& Trac
 	MulticastFire(TraceHitTarget);
 }
 
-void UCombatComponent::ServerShotgunFire_Implementation(const TArray<FVector_NetQuantize>& TraceHitTargets)
+void UCombatComponent::ServerShotgunFire_Implementation(const TArray<FVector_NetQuantize>& TraceHitTargets, float FireDelay)
 {
 	MulticastShotgunFire(TraceHitTargets);
+}
+
+bool UCombatComponent::ServerFire_Validate(const FVector_NetQuantize& TraceHitTarget, float FireDelay)
+{
+	if (EquippedWeapon)
+	{
+		bool bNearlyEqual = FMath::IsNearlyEqual(EquippedWeapon->FireDelay, FireDelay, 0.001f);
+		bNearlyEqual;
+	}
+
+	return true;
+}
+
+bool UCombatComponent::ServerShotgunFire_Validate(const TArray<FVector_NetQuantize>& TraceHitTargets, float FireDelay)
+{
+	if (EquippedWeapon)
+	{
+		bool bNearlyEqual = FMath::IsNearlyEqual(EquippedWeapon->FireDelay, FireDelay, 0.001f);
+		bNearlyEqual;
+	}
+
+	return true;
 }
 
 void UCombatComponent::MulticastFire_Implementation(const FVector_NetQuantize& TraceHitTarget)
@@ -954,7 +976,7 @@ void UCombatComponent::LocalFire(const FVector_NetQuantize& TraceHitTarget)
 void UCombatComponent::FireProjectileWeapon()
 {
 	LocalFire(HitTarget);
-	ServerFire(HitTarget);
+	ServerFire(HitTarget, EquippedWeapon->FireDelay);
 }
 
 void UCombatComponent::FireHitScanWeapon()
@@ -963,7 +985,7 @@ void UCombatComponent::FireHitScanWeapon()
 	{
 		HitTarget = EquippedWeapon->bUseScatter ? EquippedWeapon->TraceEndWithScatter(HitTarget) : HitTarget;
 		LocalFire(HitTarget);
-		ServerFire(HitTarget);
+		ServerFire(HitTarget, EquippedWeapon->FireDelay);
 	}
 }
 
@@ -979,7 +1001,7 @@ void UCombatComponent::FireShotgun()
 			ShotgunLocalFire(HitTargets);
 		}
 
-		ServerShotgunFire(HitTargets);
+		ServerShotgunFire(HitTargets, EquippedWeapon->FireDelay);
 	}
 }
 
