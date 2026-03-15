@@ -7,7 +7,10 @@
 #include "Sound/SoundCue.h"
 #include "Components/BoxComponent.h"
 #include "NiagaraComponent.h"
+#include "Blaster/Public/Character/BlasterCharacter.h"
 #include "Sound/SoundCue.h"
+#include "Blaster/Public/BlasterComponents/LagCompensationComponent.h"
+#include "Blaster/Public/BlasterPlayerController.h"
 #include "Components/AudioComponent.h"
 
 AProjectileRocket::AProjectileRocket()
@@ -58,12 +61,52 @@ void AProjectileRocket::Destroyed()
 
 void AProjectileRocket::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	if (OtherActor == GetOwner())
+	if (OtherActor == GetOwner() || !GetWorld())
 	{
 		return;
 	}
 
-	ExplodeDamage();
+	ABlasterCharacter* OwnerCharacter = Cast<ABlasterCharacter>(GetOwner());
+	APawn* FiringPawn = GetInstigator();
+	AController* FiringController = FiringPawn == nullptr ? nullptr : FiringPawn->GetController();
+	ABlasterPlayerController* BlasterController = nullptr;
+	if (FiringController)
+	{
+		BlasterController = Cast<ABlasterPlayerController>(FiringController);
+	}
+
+	if (OwnerCharacter && OwnerCharacter->IsLocallyControlled() && FiringController /* && bUseServerSideRewind*/ && OwnerCharacter->GetLagCompensation() && !HasAuthority())
+	{
+		TArray<FOverlapResult> Overlaps;
+
+		FCollisionShape Sphere = FCollisionShape::MakeSphere(DamageInnerRadius * 1.1f);
+		GetWorld()->OverlapMultiByObjectType(
+			Overlaps, 
+			GetActorLocation(),
+			FQuat::Identity,
+			FCollisionObjectQueryParams(ECC_Pawn),
+			Sphere
+		);
+
+		TArray<ABlasterCharacter*> CharactersToRewind;
+		for (auto& Overlap : Overlaps)
+		{
+			ABlasterCharacter* Character = Cast<ABlasterCharacter>(Overlap.GetActor());
+
+			if (Character)
+			{
+				CharactersToRewind.Add(Character);
+			}		
+		}
+
+		OwnerCharacter->GetLagCompensation()->ProjectileRocketServerScoreRequest(CharactersToRewind,
+			this, 
+			BlasterController->GetServerTime() - BlasterController->SingleTripTime);
+	}
+	else
+	{
+		ExplodeDamage();
+	}
 
 	StartDestroyTimer();
 

@@ -9,6 +9,7 @@
 class ABlasterPlayerController;
 class ABlasterCharacter;
 class ABaseWeapon;
+class AProjectileRocket;
 
 USTRUCT(BlueprintType)
 struct FBoxInformation
@@ -101,10 +102,20 @@ public:
 		const FVector_NetQuantize100& InitialVelocity,
 		float HitTime);
 
+	UFUNCTION(Server, Reliable)
+	void ProjectileRocketServerScoreRequest(const TArray<ABlasterCharacter*>& HitCharacters, 
+		AProjectileRocket* ProjectileRocket, 
+		float HitTime);
+
 	FServerSideRewindResult ProjectileServerSideRewind(ABlasterCharacter* HitCharacter,
 		const FVector_NetQuantize& TraceStart,
 		const FVector_NetQuantize100& InitialVelocity,
 		float HitTime);
+
+	void ProjectileRocketExecuteExplodion(const TArray<FFramePackage>& FramePackages, AProjectileRocket* ProjectileRocket);
+	
+	void ProjectileRocketServerSideRewind(const TArray<ABlasterCharacter*>& HitCharacters,
+		AProjectileRocket* ProjectileRocket, float HitTime);
 
 protected:
 	virtual void BeginPlay() override;
@@ -149,6 +160,14 @@ protected:
 		const FVector_NetQuantize100& InitialVelocity,
 		float HitTime
 	);
+
+	//bool ProjectileRocketConfirmHit(
+	//	const FFramePackage& Package,
+	//	ABlasterCharacter* HitCharacter,
+	//	const FVector_NetQuantize& TraceStart,
+	//	const FCollisionShape Sphere
+	//	float HitTime
+	//);
 
 private:
 	UPROPERTY()

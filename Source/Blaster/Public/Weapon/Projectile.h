@@ -38,13 +38,14 @@ public:
 
 	AProjectile();
 
+	void ExplodeDamage();
+
 protected:
 	virtual void BeginPlay() override;
 
 	void StartDestroyTimer();
 	void DestroyTimerFinished();
 	void SpawnTrailSystem();
-	void ExplodeDamage();
 
 	UFUNCTION()
 	virtual void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);

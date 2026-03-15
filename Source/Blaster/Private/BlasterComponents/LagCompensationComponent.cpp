@@ -7,6 +7,7 @@
 #include "Components/BoxComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Blaster.h"
+#include "Blaster/Public/Weapon/ProjectileRocket.h"
 
 #include "DrawDebugHelpers.h"
 
@@ -646,6 +647,13 @@ void ULagCompensationComponent::ProjectileServerScoreRequest_Implementation(ABla
 	}
 }
 
+void ULagCompensationComponent::ProjectileRocketServerScoreRequest_Implementation(const TArray<ABlasterCharacter*>& HitCharacters,
+	AProjectileRocket* ProjectileRocket,
+	float HitTime)
+{
+	ProjectileRocketServerSideRewind(HitCharacters, ProjectileRocket, HitTime);
+}
+
 FServerSideRewindResult ULagCompensationComponent::ProjectileServerSideRewind(ABlasterCharacter* HitCharacter,
 	const FVector_NetQuantize& TraceStart,
 	const FVector_NetQuantize100& InitialVelocity,
@@ -653,4 +661,51 @@ FServerSideRewindResult ULagCompensationComponent::ProjectileServerSideRewind(AB
 {
 	FFramePackage FrameToCheck = GetFrameToCheck(HitCharacter, HitTime);
 	return ProjectileConfirmHit(FrameToCheck, HitCharacter, TraceStart, InitialVelocity, HitTime);
+}
+
+void ULagCompensationComponent::ProjectileRocketServerSideRewind(const TArray<ABlasterCharacter*>& HitCharacters,
+	AProjectileRocket* ProjectileRocket,
+	float HitTime
+)
+{
+	TArray<FFramePackage> FramesToCheck;
+
+	for (ABlasterCharacter* HitCharacter : HitCharacters)
+	{
+		FramesToCheck.Add(GetFrameToCheck(HitCharacter, HitTime));
+	}
+
+	ProjectileRocketExecuteExplodion(FramesToCheck, ProjectileRocket);
+}
+
+void ULagCompensationComponent::ProjectileRocketExecuteExplodion(const TArray<FFramePackage>& FramePackages, AProjectileRocket* ProjectileRocket)
+{
+	for (auto& Frame : FramePackages)
+	{
+
+		if (Frame.Character == nullptr)
+		{
+			return;
+		}
+	}
+
+	TArray<FFramePackage> CurrentFrames;
+
+	for (auto& Frame : FramePackages)
+	{
+		FFramePackage CurrentFrame;
+		CurrentFrame.Character = Frame.Character;
+		CacheBoxPositions(Frame.Character, CurrentFrame);
+		MoveBoxes(Frame.Character, Frame);
+		EnableCharacterMeshCollision(Frame.Character, ECollisionEnabled::NoCollision);
+		CurrentFrames.Add(CurrentFrame);
+	}
+
+	ProjectileRocket->ExplodeDamage();
+
+	for (auto& Frame : CurrentFrames)
+	{
+		ResetHitBoxes(Frame.Character, Frame);
+		EnableCharacterMeshCollision(Frame.Character, ECollisionEnabled::QueryAndPhysics);
+	}
 }
