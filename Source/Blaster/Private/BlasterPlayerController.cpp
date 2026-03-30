@@ -14,6 +14,7 @@
 #include <Kismet/GameplayStatics.h>
 #include "Blaster/Public/BlasterComponents/CombatComponent.h"
 #include "Blaster/Public/GameState/BlasterGameState.h"
+#include "Blaster/Public/HUD/ReturnToMainMenu.h"
 #include "Components/Image.h"
 #include "TimerManager.h"
 
@@ -24,6 +25,17 @@ void ABlasterPlayerController::BeginPlay()
 	BlasterHUD = Cast<ABlasterHUD>(GetHUD());
 
 	ServerCheckMatchState();
+}
+
+void ABlasterPlayerController::SetupInputComponent()
+{
+	Super::SetupInputComponent();
+	if (InputComponent == nullptr)
+	{
+		return;
+	}
+
+	InputComponent->BindAction("Quit", IE_Pressed, this, &ABlasterPlayerController::ShowReturnToMainMenu);
 }
 
 void ABlasterPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -101,6 +113,31 @@ void ABlasterPlayerController::CheckPing(float DeltaTime)
 		if (PingAnimationRunningTime > HighPingDuration)
 		{
 			StopHighPingWarning();
+		}
+	}
+}
+
+void ABlasterPlayerController::ShowReturnToMainMenu()
+{
+	if (ReturnToMainMenuWidget == nullptr)
+	{
+		return;
+	}
+
+	if (ReturnToMainMenu == nullptr)
+	{
+		ReturnToMainMenu = CreateWidget<UReturnToMainMenu>(this, ReturnToMainMenuWidget);
+	}
+	if (ReturnToMainMenu)
+	{
+		bReturnToMainMenu = !bReturnToMainMenu;
+		if (bReturnToMainMenu)
+		{
+			ReturnToMainMenu->MenuSetup();
+		}
+		else
+		{
+			ReturnToMainMenu->MenuTearDown();
 		}
 	}
 }

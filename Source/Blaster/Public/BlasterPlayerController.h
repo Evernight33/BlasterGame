@@ -12,6 +12,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FHighPingDelegate, bool, bPingTooHig
 class ABlasterHUD;
 class UCharacterOverlay;
 class ABlasterGameMode;
+class UUserWidget;
+class UReturnToMainMenu;
 
 UCLASS()
 class BLASTER_API ABlasterPlayerController : public APlayerController
@@ -48,6 +50,8 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	virtual void SetupInputComponent() override;
+
 	void SetHUDTime();
 
 	/**
@@ -72,6 +76,8 @@ protected:
 	void StopHighPingWarning();
 	void CheckPing(float DeltaTime);
 
+	void ShowReturnToMainMenu();
+
 	void CheckTimeSync(float DeltaTime);	
 
 	float ClientServerDelta = 0.0f; // Difference between client and server time
@@ -84,7 +90,19 @@ protected:
 private:
 	UPROPERTY()
 	ABlasterHUD* BlasterHUD;
+
+	/**
+	* Return To Main Menu
+	*/
 	
+	UPROPERTY(EditAnywhere, Category = HUD)
+	TSubclassOf<UUserWidget> ReturnToMainMenuWidget;
+
+	UPROPERTY()
+	UReturnToMainMenu* ReturnToMainMenu;
+
+	bool bReturnToMainMenu = false;
+
 	float LevelStartingTime = 0.0f;
 	float MatchTime = 0.0f;
 	float WarmupTime = 0.0f;

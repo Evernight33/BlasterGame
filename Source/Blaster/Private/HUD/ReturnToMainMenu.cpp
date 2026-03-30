@@ -6,7 +6,7 @@
 #include "MultiplayerSessionsSubsystem.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/GameModeBase.h"
-
+PRAGMA_DISABLE_OPTIMIZATION
 void UReturnToMainMenu::MenuSetup()
 {
 	AddToViewport();
@@ -16,7 +16,7 @@ void UReturnToMainMenu::MenuSetup()
 	UWorld* World = GetWorld();
 	if (World)
 	{
-		PlayerController == nullptr ? World->GetFirstPlayerController() : PlayerController;
+		PlayerController = PlayerController == nullptr ? World->GetFirstPlayerController() : PlayerController;
 		if (PlayerController)
 		{
 			FInputModeGameAndUI InputModeData;
@@ -26,7 +26,7 @@ void UReturnToMainMenu::MenuSetup()
 		}
 	}
 
-	if (ReturnButton)
+	if (ReturnButton && !ReturnButton->OnClicked.IsBound())
 	{
 		ReturnButton->OnClicked.AddDynamic(this, &UReturnToMainMenu::ReturnButtonClicked);
 	}
@@ -35,7 +35,7 @@ void UReturnToMainMenu::MenuSetup()
 	if (GameInstance)
 	{
 		MultiplayerSessionsSubsystem = GameInstance->GetSubsystem<UMultiplayerSessionsSubsystem>();
-		if (MultiplayerSessionsSubsystem)
+		if (MultiplayerSessionsSubsystem && !MultiplayerSessionsSubsystem->MultiplayerOnDestroySessionComplete.IsBound())
 		{
 			MultiplayerSessionsSubsystem->MultiplayerOnDestroySessionComplete.AddDynamic(this, &UReturnToMainMenu::OnDestroySession);
 		}
@@ -48,13 +48,21 @@ void UReturnToMainMenu::MenuTearDown()
 	UWorld* World = GetWorld();
 	if (World)
 	{
-		PlayerController == nullptr ? World->GetFirstPlayerController() : PlayerController;
+		PlayerController = PlayerController == nullptr ? World->GetFirstPlayerController() : PlayerController;
 		if (PlayerController)
 		{
 			FInputModeGameOnly InputModeData;
 			PlayerController->SetInputMode(InputModeData);
 			PlayerController->SetShowMouseCursor(false);
 		}
+	}
+	if (ReturnButton && ReturnButton->OnClicked.IsBound())
+	{
+		ReturnButton->OnClicked.RemoveDynamic(this, &UReturnToMainMenu::ReturnButtonClicked);
+	}
+	if (MultiplayerSessionsSubsystem && MultiplayerSessionsSubsystem->MultiplayerOnDestroySessionComplete.IsBound())
+	{
+		MultiplayerSessionsSubsystem->MultiplayerOnDestroySessionComplete.RemoveDynamic(this, &UReturnToMainMenu::OnDestroySession);
 	}
 }
 
@@ -104,3 +112,4 @@ void UReturnToMainMenu::ReturnButtonClicked()
 		MultiplayerSessionsSubsystem->DestroySession();
 	}
 }
+PRAGMA_ENABLE_OPTIMIZATION
