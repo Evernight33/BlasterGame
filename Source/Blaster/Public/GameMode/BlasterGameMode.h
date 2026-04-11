@@ -8,6 +8,7 @@
 
 class ABlasterCharacter;
 class ABlasterPlayerController;
+class ABlasterPlayerState;
 class ACharacter;
 
 namespace MatchState
@@ -25,6 +26,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void PlayerEliminated(ABlasterCharacter* ElimmedCharacter, ABlasterPlayerController* VictimController, ABlasterPlayerController* AttackerController);
 	virtual void RequestRespawn(ACharacter* EliminatedCharacter, AController* EliminatedController);
+
+	void PlayerLeftGame(ABlasterPlayerState* PlayerLeaving);
 
 	UPROPERTY(EditDefaultsOnly)
 	float WarmupTime = 3.0f;

@@ -11,6 +11,7 @@
 #include "Components/TimelineComponent.h"
 #include "BlasterCharacter.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLeftGame);
 
 class UWidgetComponent;
 class ABaseWeapon;
@@ -57,7 +58,7 @@ public:
 	void PlayElimintationMontage();
 	void PlayThrowGrenadeMontage();
 	void PlayKnifeStabMontage();
-	void Eliminate();
+	void Eliminate(bool bPlayerLeftGame);
 	void PerformKnifeStab();
 	void UpdateHUDHealth();
 	void UpdateHUDShield();
@@ -65,10 +66,13 @@ public:
 	void SpawnDefaultWeapon();
 
 	UFUNCTION(NetMulticast, Reliable)
-	void MulticastEliminate();		
+	void MulticastEliminate(bool bPlayerLeftGame);
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastThrowGrenade();
+
+	UFUNCTION(Server, Reliable)
+	void ServerLeaveGame();
 
 	bool IsWeaponEquipped();
 	bool IsAiming();
@@ -110,6 +114,8 @@ public:
 	TMap<FName, UBoxComponent*> HitCollisionBoxes;
 
 	bool bFinishedSwapping = false;
+
+	FOnLeftGame OnLeftGame;
 	
 protected:
 	virtual void BeginPlay() override;
@@ -202,6 +208,8 @@ protected:
 
 private:
 	bool bInitializeAmmo = false;
+
+	bool bLeftGame = false;
 
 	UPROPERTY(VisibleAnywhere, Category = Camera)
 	class USpringArmComponent* CameraBoom;

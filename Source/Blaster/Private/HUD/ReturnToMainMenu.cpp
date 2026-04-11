@@ -6,7 +6,8 @@
 #include "MultiplayerSessionsSubsystem.h"
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/GameModeBase.h"
-PRAGMA_DISABLE_OPTIMIZATION
+#include "Blaster/Public/Character/BlasterCharacter.h"
+
 void UReturnToMainMenu::MenuSetup()
 {
 	AddToViewport();
@@ -103,13 +104,34 @@ void UReturnToMainMenu::OnDestroySession(bool bWasSuccessfull)
 	}
 }
 
-void UReturnToMainMenu::ReturnButtonClicked()
+void UReturnToMainMenu::OnPlayerLeftGame()
 {
-	ReturnButton->SetIsEnabled(false);
-
 	if (MultiplayerSessionsSubsystem)
 	{
 		MultiplayerSessionsSubsystem->DestroySession();
 	}
 }
-PRAGMA_ENABLE_OPTIMIZATION
+
+void UReturnToMainMenu::ReturnButtonClicked()
+{
+	ReturnButton->SetIsEnabled(false);
+
+	UWorld*  World = GetWorld();
+	if (World)
+	{
+		APlayerController* FirstPlayerController = World->GetFirstPlayerController();
+		if (FirstPlayerController)
+		{
+			ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(FirstPlayerController->GetPawn());
+			if (BlasterCharacter)
+			{
+				BlasterCharacter->ServerLeaveGame();
+				BlasterCharacter->OnLeftGame.AddDynamic(this, &UReturnToMainMenu::OnPlayerLeftGame);
+			}
+			else
+			{
+				ReturnButton->SetIsEnabled(true);
+			}
+		}
+	}
+}

@@ -260,7 +260,7 @@ void ABlasterCharacter::PlayKnifeStabMontage()
 	}
 }
 
-void ABlasterCharacter::Eliminate()
+void ABlasterCharacter::Eliminate(bool bPlayerLeftGame)
 {
 	if (!IsFirstEliminationCall)
 	{
@@ -269,13 +269,7 @@ void ABlasterCharacter::Eliminate()
 
 	IsFirstEliminationCall = false;
 
-	MulticastEliminate();
-
-	GetWorldTimerManager().SetTimer(
-		EliminateTimer,
-		this,
-		&ABlasterCharacter::EliminateTimerFinished,
-		EliminateDelay);
+	MulticastEliminate(bPlayerLeftGame);
 
 	if (Combat)
 	{
@@ -293,8 +287,9 @@ void ABlasterCharacter::Eliminate()
 	}
 }
 
-void ABlasterCharacter::MulticastEliminate_Implementation()
+void ABlasterCharacter::MulticastEliminate_Implementation(bool bPlayerLeftGame)
 {
+	bLeftGame = bPlayerLeftGame;
 	if (BlasterPlayerController)
 	{
 		BlasterPlayerController->SetHUDWeaponAmmo(0);
@@ -369,6 +364,12 @@ void ABlasterCharacter::MulticastEliminate_Implementation()
 	{
 		ShowSniperScopeWidget(false);
 	}
+
+	GetWorldTimerManager().SetTimer(
+		EliminateTimer,
+		this,
+		&ABlasterCharacter::EliminateTimerFinished,
+		EliminateDelay);
 }
 
 void ABlasterCharacter::MulticastThrowGrenade_Implementation()
@@ -1093,6 +1094,16 @@ void ABlasterCharacter::KnifeStabButtonPressed()
 	}
 }
 
+void ABlasterCharacter::ServerLeaveGame_Implementation()
+{
+	ABlasterGameMode* BlasterGameMode = GetWorld()->GetAuthGameMode<ABlasterGameMode>();
+	BlasterPlayerState = BlasterPlayerState == nullptr ? GetPlayerState<ABlasterPlayerState>() : BlasterPlayerState;
+	if (BlasterGameMode && BlasterPlayerState)
+	{
+		BlasterGameMode->PlayerLeftGame(BlasterPlayerState);
+	}
+}
+
 void ABlasterCharacter::OnRep_Health(float LastHealth)
 {
 	UpdateHUDHealth();
@@ -1138,7 +1149,7 @@ void ABlasterCharacter::EliminateTimerFinished()
 	{
 		ABlasterGameMode* BlasterGameMode = GetWorld()->GetAuthGameMode<ABlasterGameMode>();
 
-		if (BlasterGameMode)
+		if (BlasterGameMode && !bLeftGame)
 		{
 			BlasterGameMode->RequestRespawn(this, Controller);
 		}		
@@ -1146,6 +1157,11 @@ void ABlasterCharacter::EliminateTimerFinished()
 		if (ElimBotComponent)
 		{
 			ElimBotComponent->DestroyComponent();
+		}
+
+		if (bLeftGame && IsLocallyControlled())
+		{
+			OnLeftGame.Broadcast();
 		}
 
 		IsFirstEliminationCall = true;
