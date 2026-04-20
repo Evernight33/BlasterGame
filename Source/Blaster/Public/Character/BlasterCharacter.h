@@ -26,6 +26,8 @@ class UCombatComponent;
 class UBuffComponent;
 class UBoxComponent;
 class ULagCompensationComponent;
+class UNiagaraSystem;
+class UNiagaraComponent;
 
 UCLASS()
 class BLASTER_API ABlasterCharacter : public ACharacter, public IInteractWithCrosshairsInterface
@@ -70,6 +72,12 @@ public:
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastThrowGrenade();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastLostTheLead();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastGainedTheLead();
 
 	UFUNCTION(Server, Reliable)
 	void ServerLeaveGame();
@@ -302,6 +310,12 @@ private:
 
 	UPROPERTY()
 	ABlasterPlayerState* BlasterPlayerState;
+
+	UPROPERTY(EditAnywhere)
+	UNiagaraSystem* CrownSystem;
+
+	UPROPERTY()
+	UNiagaraComponent* CrownComponent;
 
 	/*
 	* Grenade

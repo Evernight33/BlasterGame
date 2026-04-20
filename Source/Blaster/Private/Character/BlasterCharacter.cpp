@@ -24,6 +24,9 @@
 #include "Blaster/Public/Weapon/WeaponTypes.h"
 #include "Components/BoxComponent.h"
 #include "Blaster/Public/BlasterComponents/LagCompensationComponent.h"
+#include "Blaster/Public/GameState/BlasterGameState.h"
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 
 ABlasterCharacter::ABlasterCharacter()
 {
@@ -365,6 +368,11 @@ void ABlasterCharacter::MulticastEliminate_Implementation(bool bPlayerLeftGame)
 		ShowSniperScopeWidget(false);
 	}
 
+	if (CrownComponent)
+	{
+		CrownComponent->DestroyComponent();
+	}
+
 	GetWorldTimerManager().SetTimer(
 		EliminateTimer,
 		this,
@@ -378,6 +386,38 @@ void ABlasterCharacter::MulticastThrowGrenade_Implementation()
 	{
 		Combat->ShowAttachedGrenade(false);
 	}	
+}
+
+void ABlasterCharacter::MulticastLostTheLead_Implementation()
+{
+	if (CrownComponent)
+	{
+		CrownComponent->DestroyComponent();
+	}
+}
+
+void ABlasterCharacter::MulticastGainedTheLead_Implementation()
+{
+	if (CrownSystem == nullptr)
+	{
+		return;
+	}
+
+	if (CrownComponent == nullptr)
+	{
+		CrownComponent = UNiagaraFunctionLibrary::SpawnSystemAttached(
+			CrownSystem,
+			GetCapsuleComponent(),
+			FName(),
+			GetActorLocation() + FVector(0.f, 0.f, 110.f),
+			GetActorRotation(),
+			EAttachLocation::KeepWorldPosition,
+			false);
+	}
+	if (CrownComponent)
+	{
+		CrownComponent->Activate();
+	}
 }
 
 void ABlasterCharacter::TurnInPlace(float DeltaTime)
@@ -675,6 +715,8 @@ void ABlasterCharacter::BeginPlay()
 			AnimInstance->OnMontageEnded.AddDynamic(this, &ABlasterCharacter::OnMontageEnded);
 		}
 	}
+
+	
 }
 
 void ABlasterCharacter::MoveForward(float Value)
@@ -1008,6 +1050,13 @@ void ABlasterCharacter::PollInit()
 				}
 			}			
 		}
+	}
+
+	ABlasterGameState* BlasterGameState = Cast<ABlasterGameState>(UGameplayStatics::GetGameState(this));
+
+	if (BlasterGameState && BlasterGameState->TopScoringPlayers.Contains(BlasterPlayerState))
+	{
+		MulticastGainedTheLead();
 	}
 }
 
