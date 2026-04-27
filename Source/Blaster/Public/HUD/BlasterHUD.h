@@ -10,6 +10,8 @@ class UTexture2D;
 class UCharacterOverlay;
 class UUserWidget;
 class UAnnouncement;
+class UElimAnnouncement;
+class AplayerController;
 
 USTRUCT(BlueprintType)
 struct FHUDPackage
@@ -35,6 +37,7 @@ public:
 
 	void AddCharacterOverlay();
 	void AddAnnouncement();
+	void AddElimAnnouncement(FString Attacker, FString Victim);
 
 	UPROPERTY(EditAnywhere, Category = "Player Stats")
 	TSubclassOf<UUserWidget> CharacterOverlayClass;
@@ -52,10 +55,16 @@ protected:
 	virtual void BeginPlay() override;	
 
 private:
+	UPROPERTY()
+	APlayerController* OwningPlayer;
+
 	FHUDPackage HUDPackage;
 
 	UPROPERTY(EditAnywhere)
 	float CrosshairSpreadMax = 16.f;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UElimAnnouncement> ElimAnnouncementClass;
 
 	void DrawCrosshair(UTexture2D* Texture, FVector2d ViewportCenter, FVector2D Spread, FLinearColor CrosshairsColor);
 
