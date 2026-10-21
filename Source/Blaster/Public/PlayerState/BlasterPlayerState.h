@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerState.h"
+#include "Blaster/Public/BlasterTypes/Team.h"
 #include "BlasterPlayerState.generated.h"
 
 class ABlasterCharacter;
@@ -40,4 +41,11 @@ private:
 
 	UPROPERTY(ReplicatedUsing = OnRep_ElimText)
 	bool IsVisibleElimText;
+
+	UPROPERTY(Replicated)
+	ETeam Team = ETeam::ET_NoTeam;
+
+public:
+	FORCEINLINE ETeam GetTeam() const { return Team; }
+	FORCEINLINE void SetTeam(ETeam TeamToSet) { Team = TeamToSet; }
 };

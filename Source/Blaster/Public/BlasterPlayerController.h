@@ -20,6 +20,9 @@ class BLASTER_API ABlasterPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 public:
+	UFUNCTION(Server, Reliable)
+	void ServerSendChatMessage(const FString& Message);
+
 	void SetHUDHealth(float CurrentHealth, float MaxHealth);
 	void SetHUDShield(float Shield, float MaxShield);
 	void SetHUDScore(float Score);
@@ -36,6 +39,8 @@ public:
 	void HandleMatchHasStarted();
 	void HandleCooldown();
 	void BroadcastElim(APlayerState* Attacker, APlayerState* Victim);
+
+	void CloseChat();
 
 	virtual void OnPossess(APawn* InPawn) override;
 	virtual void Tick(float DeltaTime) override;
@@ -76,11 +81,16 @@ protected:
 	UFUNCTION(Client, Reliable)
 	void ClientElimAnnouncement(APlayerState* Attacker, APlayerState* Victim);
 
+	UFUNCTION(Client, Reliable)
+	void ClientReceiveChatMessage(const FString& Sender, const FString& Message);
+
 	void StartHighPingWarning();
 	void StopHighPingWarning();
 	void CheckPing(float DeltaTime);
 
 	void ShowReturnToMainMenu();
+
+	void OpenChat();
 
 	void CheckTimeSync(float DeltaTime);	
 
@@ -112,7 +122,8 @@ private:
 	float WarmupTime = 0.0f;
 	float CooldownTime = 0.0f;
 	uint32 CountdownInt = 0;
-	bool bIsTimerSet = false;		
+	bool bIsTimerSet = false;
+	bool bChatOpened = false;
 
 	float HighPingRunningTime = 0.f;
 

@@ -4,6 +4,7 @@
 #include "BlasterPlayerController.h"
 #include "HUD/BlasterHUD.h"
 #include "HUD/CharacterOverlay.h"
+#include "HUD/ChatWidget.h"
 #include "HUD/Announcement.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
@@ -16,6 +17,7 @@
 #include "Blaster/Public/GameState/BlasterGameState.h"
 #include "Blaster/Public/HUD/ReturnToMainMenu.h"
 #include "Components/Image.h"
+#include "Components/EditableTextBox.h"
 #include "TimerManager.h"
 
 void ABlasterPlayerController::BeginPlay()
@@ -36,6 +38,7 @@ void ABlasterPlayerController::SetupInputComponent()
 	}
 
 	InputComponent->BindAction("Quit", IE_Pressed, this, &ABlasterPlayerController::ShowReturnToMainMenu);
+	InputComponent->BindAction("OpenChat", IE_Pressed, this, &ABlasterPlayerController::OpenChat);
 }
 
 void ABlasterPlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -140,6 +143,36 @@ void ABlasterPlayerController::ShowReturnToMainMenu()
 			ReturnToMainMenu->MenuTearDown();
 		}
 	}
+}
+
+void ABlasterPlayerController::OpenChat()
+{
+	if (BlasterHUD && BlasterHUD->Chat)
+	{
+		bChatOpened = true;
+
+		FInputModeGameAndUI Mode;		
+
+		Mode.SetWidgetToFocus(
+			BlasterHUD->Chat
+			->GetChatInput()
+			->TakeWidget()
+		);
+
+		SetInputMode(Mode);
+
+		BlasterHUD->Chat->ActivateChat();
+	}
+}
+
+void ABlasterPlayerController::CloseChat()
+{
+	bChatOpened = false;
+
+	FInputModeGameOnly Mode;
+	SetInputMode(Mode);
+
+	BlasterHUD->Chat->DeactivateChat();
 }
 
 void ABlasterPlayerController::CheckTimeSync(float DeltaTime)
@@ -376,6 +409,7 @@ void ABlasterPlayerController::HandleMatchHasStarted()
 		if (BlasterHUD)
 		{
 			BlasterHUD->AddCharacterOverlay();
+			BlasterHUD->AddChat();
 
 			if (BlasterHUD->Announcement)
 			{
@@ -526,6 +560,30 @@ void ABlasterPlayerController::ServerCheckMatchState_Implementation()
 	}
 }
 
+void ABlasterPlayerController::ServerSendChatMessage_Implementation(const FString& Message)
+{
+	if (Message.TrimStartAndEnd().IsEmpty())
+	{
+		return;
+	}
+
+	FString Sender = TEXT("Unknown");
+
+	if (PlayerState)
+	{
+		Sender = PlayerState->GetPlayerName();
+	}
+
+	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; It++)
+	{
+		ABlasterPlayerController* BlasterPlayer = Cast<ABlasterPlayerController>(*It);
+		if (BlasterPlayer)
+		{
+			BlasterPlayer->ClientReceiveChatMessage(Sender, Message);
+		}
+	}
+}
+
 void ABlasterPlayerController::ClientReportServerTime_Implementation(float TimeOfClientRequest, float TimeServerReceivedClientRequest)
 {
 	float RoundTripTime = GetWorld()->GetTimeSeconds() - TimeOfClientRequest;
@@ -581,6 +639,14 @@ void ABlasterPlayerController::ClientElimAnnouncement_Implementation(APlayerStat
 
 			BlasterHUD->AddElimAnnouncement(Attacker->GetPlayerName(), Victim->GetPlayerName());
 		}
+	}
+}
+
+void ABlasterPlayerController::ClientReceiveChatMessage_Implementation(const FString& Sender, const FString& Message)
+{
+	if (BlasterHUD && BlasterHUD->Chat)
+	{
+		BlasterHUD->Chat->AddChatMessage(Sender, Message);
 	}
 }
 

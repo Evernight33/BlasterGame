@@ -8,6 +8,7 @@
 
 class UTexture2D;
 class UCharacterOverlay;
+class UChatWidget;
 class UUserWidget;
 class UAnnouncement;
 class UElimAnnouncement;
@@ -36,6 +37,7 @@ public:
 	virtual void DrawHUD() override;
 
 	void AddCharacterOverlay();
+	void AddChat();
 	void AddAnnouncement();
 	void AddElimAnnouncement(FString Attacker, FString Victim);
 
@@ -50,6 +52,12 @@ public:
 
 	UPROPERTY()
 	UAnnouncement* Announcement;
+
+	UPROPERTY(EditAnywhere, Category = "Chat")
+	TSubclassOf<UUserWidget> ChatClass;
+
+	UPROPERTY()
+	UChatWidget* Chat;
 
 protected:
 	virtual void BeginPlay() override;	

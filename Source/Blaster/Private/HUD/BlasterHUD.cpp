@@ -5,6 +5,7 @@
 #include "GameFramework/PlayerController.h"
 #include "HUD/CharacterOverlay.h"
 #include "HUD/Announcement.h"
+#include "HUD/ChatWidget.h"
 #include "HUD/ElimAnnouncement.h"
 #include "Components/HorizontalBox.h"
 #include "Components/CanvasPanelSlot.h"
@@ -15,9 +16,17 @@ void ABlasterHUD::BeginPlay()
 	Super::BeginPlay();	
 
 	APlayerController* PlayerController = GetOwningPlayerController();
-	if (PlayerController && CharacterOverlayClass)
+	if (PlayerController)
 	{
-		CharacterOverlay = CreateWidget<UCharacterOverlay>(PlayerController, CharacterOverlayClass);
+		if (CharacterOverlayClass)
+		{
+			CharacterOverlay = CreateWidget<UCharacterOverlay>(PlayerController, CharacterOverlayClass);
+		}
+		
+		if (ChatClass)
+		{
+			Chat = CreateWidget<UChatWidget>(PlayerController, ChatClass);
+		}
 	}
 }
 
@@ -26,6 +35,14 @@ void ABlasterHUD::AddCharacterOverlay()
 	if (CharacterOverlayClass && CharacterOverlay)
 	{		
 		CharacterOverlay->AddToViewport();
+	}
+}
+
+void ABlasterHUD::AddChat()
+{
+	if (ChatClass && Chat)
+	{
+		Chat->AddToViewport();
 	}
 }
 
