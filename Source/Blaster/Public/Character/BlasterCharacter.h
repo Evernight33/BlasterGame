@@ -356,6 +356,9 @@ private:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<ABaseWeapon> DefaultWeaponClass;
 
+	UPROPERTY()
+	class ABlasterGameMode* BlasterGameMode;
+
 	UFUNCTION()
 	void UpdateDissolveMaterial(float DissolveValue);
 	void StartDissolve();
