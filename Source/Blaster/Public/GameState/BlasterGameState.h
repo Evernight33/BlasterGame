@@ -26,13 +26,14 @@ public:
 	/**
 	* Teams
 	*/
-	UPROPERTY(ReplicatedUsing = OnRep_RedTeamScore)
+	
 	TArray<ABlasterPlayerState*> RedTeam;
-
-	UPROPERTY(ReplicatedUsing = OnRep_BlueTeamScore)
 	TArray<ABlasterPlayerState*> BlueTeam;
 
+	UPROPERTY(ReplicatedUsing = OnRep_RedTeamScore)
 	float RedTeamScore = 0.f;
+
+	UPROPERTY(ReplicatedUsing = OnRep_BlueTeamScore)
 	float BlueTeamScore = 0.f;
 	
 	UFUNCTION()

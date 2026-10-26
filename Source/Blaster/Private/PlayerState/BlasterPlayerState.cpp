@@ -97,3 +97,23 @@ void ABlasterPlayerState::ElimTextVisibility(bool IsVisible)
 		}
 	}
 }
+
+void ABlasterPlayerState::OnRep_Team()
+{
+	ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(GetPawn());
+	if (BlasterCharacter)
+	{
+		BlasterCharacter->SetTeamColor(Team);
+	}
+}
+
+void ABlasterPlayerState::SetTeam(ETeam TeamToSet)
+{
+	Team = TeamToSet;
+
+	ABlasterCharacter* BlasterCharacter = Cast<ABlasterCharacter>(GetPawn());
+	if (BlasterCharacter)
+	{
+		BlasterCharacter->SetTeamColor(Team);
+	}
+}

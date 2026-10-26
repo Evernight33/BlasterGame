@@ -8,6 +8,7 @@
 #include "Blaster/Public/BlasterTypes/TurningInPlace.h"
 #include "Blaster/Interfaces/Public/InteractWithCrosshairsInterface.h"
 #include "Blaster/Public/BlasterTypes/CombatState.h"
+#include "Blaster/Public/BlasterTypes/Team.h"
 #include "Components/TimelineComponent.h"
 #include "BlasterCharacter.generated.h"
 
@@ -81,6 +82,8 @@ public:
 
 	UFUNCTION(Server, Reliable)
 	void ServerLeaveGame();
+
+	void SetTeamColor(ETeam Team);
 
 	bool IsWeaponEquipped();
 	bool IsAiming();
@@ -290,8 +293,27 @@ private:
 	UMaterialInstanceDynamic* DynamicDissolveMaterialInstance;
 
 	//Material instance set by default in BP
-	UPROPERTY(EditAnywhere, Category = Elim)
+	UPROPERTY(VisibleAnywhere, Category = Elim)
 	UMaterialInstance* DissolveMaterialInstance;
+
+	/*
+	* Team colors
+	*/
+
+	UPROPERTY(EditAnywhere, Category = Elim)
+	UMaterialInstance* RedDissolveMatInst;
+
+	UPROPERTY(EditAnywhere, Category = Elim)
+	UMaterialInstance* BlueDissolveMatInst;
+
+	UPROPERTY(EditAnywhere, Category = Elim)
+	UMaterialInstance* RedMaterial;
+
+	UPROPERTY(EditAnywhere, Category = Elim)
+	UMaterialInstance* BlueMaterial;
+
+	UPROPERTY(EditAnywhere, Category = Elim)
+	UMaterialInstance* OriginalMaterial;
 
 	/*
 	* Elimination bot

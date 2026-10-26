@@ -28,7 +28,7 @@ public:
 	void AddToScore(float ScoreAmount, bool IsInit = false);
 	void AddToDefeats(int32 DefeatsAmount);
 	void ElimTextVisibility(bool IsVisible);
-
+	void SetTeam(ETeam TeamToSet) { Team = TeamToSet; }
 private:
 	UPROPERTY()
 	ABlasterCharacter* Character;
@@ -42,10 +42,12 @@ private:
 	UPROPERTY(ReplicatedUsing = OnRep_ElimText)
 	bool IsVisibleElimText;
 
-	UPROPERTY(Replicated)
+	UPROPERTY(ReplicatedUsing = OnRep_Team)
 	ETeam Team = ETeam::ET_NoTeam;
+	
+	UFUNCCTION()
+	void OnRep_Team();
 
 public:
 	FORCEINLINE ETeam GetTeam() const { return Team; }
-	FORCEINLINE void SetTeam(ETeam TeamToSet) { Team = TeamToSet; }
 };
